@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_mark_read"
+        android:orderInCategory="50"
+        android:title="@string/mark_read"/>
+    <item
+        android:id="@+id/action_mark_fav"
+        android:orderInCategory="60"
+        android:title="@string/mark_fav"/>
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="20"
+        android:title="@string/refresh"/>
+    
+</menu>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="se.weinigel.weader"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="10" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="se.weinigel.weader.FeedListActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_feed_list" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:pathPattern=".*xml"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*rss"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*feed.*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*rss.*"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*RSS.*"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="se.weinigel.weader.ArticleListActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_item_list" >
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name="se.weinigel.weader.ArticlePagerActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_pager" >
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name="se.weinigel.weader.ImageViewActivity"
+            android:configChanges="orientation"
+            android:label="ImageViewActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+        </activity>
+
+        <provider
+            android:name="se.weinigel.weader.provider.WeadProvider"
+            android:authorities="se.weinigel.weader.provider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:label="WeadProvider"
+            android:readPermission="se.weinigel.weader.provider.READ"
+            android:writePermission="se.weinigel.weader.provider.WRITE" />
+
+        <service
+            android:name="se.weinigel.weader.service.AddFeedService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="se.weinigel.weader.service.UpdateFeedService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
+            android:name="se.weinigel.weader.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+    </application>
+
+</manifest>
