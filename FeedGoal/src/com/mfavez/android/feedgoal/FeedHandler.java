@@ -256,12 +256,14 @@ public class FeedHandler extends DefaultHandler {
 			} else if (value.equalsIgnoreCase("description") || value.equalsIgnoreCase("summary")) {
 				if (isItem)
 					//mItem.setContent(Html.fromHtml(mSb.toString().trim()).toString());
-					mItem.setContent(removeContentSpanObjects(mSb).toString().trim() + System.getProperty("line.separator" ));
+					// mItem.setContent(removeContentSpanObjects(mSb).toString().trim() + System.getProperty("line.separator" ));
+				    mItem.setContent(mSb.toString().trim());
 				isDescription = false;
 			} else if (value.equalsIgnoreCase("encoded") || value.equalsIgnoreCase("content")) {
 				if (isItem)
 					//mItem.setContent(Html.fromHtml(mSb.toString().trim()).toString());
-					mItem.setContent(removeContentSpanObjects(mSb).toString().trim() + System.getProperty("line.separator" ));
+					//mItem.setContent(removeContentSpanObjects(mSb).toString().trim() + System.getProperty("line.separator" ));
+					mItem.setContent(mSb.toString().trim());
 				isContent = false;
 			} else if (value.equalsIgnoreCase("source"))
 				isSource = false;
@@ -306,6 +308,7 @@ public class FeedHandler extends DefaultHandler {
 		return xr;
 	}
 	
+	@SuppressWarnings("unused")
 	private Spanned removeContentSpanObjects(StringBuffer sb) {
 		SpannableStringBuilder spannedStr = (SpannableStringBuilder)Html.fromHtml(sb.toString().trim());
 		Object[] spannedObjects = spannedStr.getSpans(0,spannedStr.length(),Object.class);
