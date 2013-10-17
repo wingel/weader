@@ -28,7 +28,7 @@ import java.net.URL;
  * Created 29/06/2010
  */
 public class Enclosure {
-	private static final String LOG_TAG = "Enclosure";
+	// private static final String LOG_TAG = "Enclosure";
 	
 	private long mId = -1;
 	private String mMime;

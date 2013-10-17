@@ -61,7 +61,7 @@ import com.mfavez.android.feedgoal.storage.SharedPreferencesHelper;
  */
 public class FeedHandler extends DefaultHandler {
 
-	private static final String LOG_TAG = "FeedHandler";
+	// private static final String LOG_TAG = "FeedHandler";
 	
 	private Feed mFeed;
 	private Item mItem;

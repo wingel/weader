@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -260,7 +261,8 @@ public class FeedWebActivity extends Activity {
 		}
     }
     
-    private void displayWebView() {
+    @SuppressLint("SetJavaScriptEnabled")
+	private void displayWebView() {
     	if (!isOnline())
 			showDialog(SharedPreferencesHelper.DIALOG_NO_CONNECTION);
 		else if (mItemId != -1) {
@@ -380,41 +382,41 @@ public class FeedWebActivity extends Activity {
     }
     
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-	        case R.id.menu_opt_home:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Home","Home",1);
-	        	// Kill the FeedTabActivity that started this FeedWebActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
-	        	setResult(RESULT_OK);
-	        	startActivity(item.getIntent());
-		    	//finish();
-	        	return true;
-	        case R.id.menu_opt_channels:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Channels","Channels",1);
-	        	if (SharedPreferencesHelper.isDynamicMode(this)) {
-	        		// Kill the FeedTabActivity that started this FeedWebActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
-	        		setResult(RESULT_OK);
-	        		startActivityForResult(item.getIntent(),KILL_ACTIVITY_CODE);
-	        	} else {
-	        		//do nothing, default case will be handled
-	        	}
-	            return true;
-	        case R.id.menu_opt_preferences:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Preferences","Preferences",1);
-	        	startActivity(item.getIntent());
-	            return true;
-	        case R.id.menu_opt_about:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_AboutDialog","About",1);
-	        	showDialog(SharedPreferencesHelper.DIALOG_ABOUT);
-	            return true;
-	        default:
-	        	if (item.getGroupId() == SharedPreferencesHelper.CHANNEL_SUBMENU_GROUP) {
-	        		// Kill the FeedTabActivity that started this FeedWebActivity, because tab channel id is now changing and won't be correct (won't be the initial FeedChannelActivity channel id) if back button is pressed
-	        		setResult(RESULT_OK);
-	        		startActivity(item.getIntent());
-	        		//finish();
-	        		return true;
-	        	}
-	    }
+        int itemId = item.getItemId();
+		if (itemId == R.id.menu_opt_home) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Home","Home",1);
+			// Kill the FeedTabActivity that started this FeedWebActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
+			setResult(RESULT_OK);
+			startActivity(item.getIntent());
+			//finish();
+			return true;
+		} else if (itemId == R.id.menu_opt_channels) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Channels","Channels",1);
+			if (SharedPreferencesHelper.isDynamicMode(this)) {
+				// Kill the FeedTabActivity that started this FeedWebActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
+				setResult(RESULT_OK);
+				startActivityForResult(item.getIntent(),KILL_ACTIVITY_CODE);
+			} else {
+				//do nothing, default case will be handled
+			}
+			return true;
+		} else if (itemId == R.id.menu_opt_preferences) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Preferences","Preferences",1);
+			startActivity(item.getIntent());
+			return true;
+		} else if (itemId == R.id.menu_opt_about) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_AboutDialog","About",1);
+			showDialog(SharedPreferencesHelper.DIALOG_ABOUT);
+			return true;
+		} else {
+			if (item.getGroupId() == SharedPreferencesHelper.CHANNEL_SUBMENU_GROUP) {
+				// Kill the FeedTabActivity that started this FeedWebActivity, because tab channel id is now changing and won't be correct (won't be the initial FeedChannelActivity channel id) if back button is pressed
+				setResult(RESULT_OK);
+				startActivity(item.getIntent());
+				//finish();
+				return true;
+			}
+		}
         return super.onOptionsItemSelected(item);
     }
     

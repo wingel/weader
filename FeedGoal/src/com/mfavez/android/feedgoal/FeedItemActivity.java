@@ -48,7 +48,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.ads.AdRequest;
-import com.google.ads.AdView;
 import com.mfavez.android.feedgoal.common.Feed;
 import com.mfavez.android.feedgoal.common.Item;
 import com.mfavez.android.feedgoal.common.TrackerAnalyticsHelper;
@@ -154,7 +153,7 @@ public class FeedItemActivity extends Activity {
     
     private void adjustLinkableTextColor (View v) {
     	TextView textView = (TextView) v;
-    	textView.setTextColor(R.color.color2);
+    	textView.setTextColor(getResources().getColor(R.color.color2));
     	
     }
     
@@ -278,41 +277,41 @@ public class FeedItemActivity extends Activity {
     }
     
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-	        case R.id.menu_opt_home:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Home","Home",1);
-	        	// Kill the FeedTabActivity that started this FeedItemActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
-	        	setResult(RESULT_OK);
-	        	startActivity(item.getIntent());
-		    	//finish();
-	        	return true;
-	        case R.id.menu_opt_channels:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Channels","Channels",1);
-	        	if (SharedPreferencesHelper.isDynamicMode(this)) {
-	        		// Kill the FeedTabActivity that started this FeedItemActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
-	        		setResult(RESULT_OK);
-	        		startActivityForResult(item.getIntent(),KILL_ACTIVITY_CODE);
-	        	} else {
-	        		//do nothing, default case will be handled
-	        	}
-	            return true;
-	        case R.id.menu_opt_preferences:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Preferences","Preferences",1);
-	        	startActivity(item.getIntent());
-	            return true;
-	        case R.id.menu_opt_about:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_AboutDialog","About",1);
-	        	showDialog(SharedPreferencesHelper.DIALOG_ABOUT);
-	            return true;
-	        default:
-	        	if (item.getGroupId() == SharedPreferencesHelper.CHANNEL_SUBMENU_GROUP) {
-	        		// Kill the FeedTabActivity that started this FeedItemActivity, because tab channel id is now changing and won't be correct (won't be the initial FeedTabActivity channel id) if back button is pressed
-	        		setResult(RESULT_OK);
-	        		startActivity(item.getIntent());
-	        		//finish();
-	        		return true;
-	        	}
-	    }
+        int itemId = item.getItemId();
+		if (itemId == R.id.menu_opt_home) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Home","Home",1);
+			// Kill the FeedTabActivity that started this FeedItemActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
+			setResult(RESULT_OK);
+			startActivity(item.getIntent());
+			//finish();
+			return true;
+		} else if (itemId == R.id.menu_opt_channels) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Channels","Channels",1);
+			if (SharedPreferencesHelper.isDynamicMode(this)) {
+				// Kill the FeedTabActivity that started this FeedItemActivity, because tab channel id may have changed and wouldn't be correct (wouldn't be the initial FeedTabActivity channel id) if back button is pressed
+				setResult(RESULT_OK);
+				startActivityForResult(item.getIntent(),KILL_ACTIVITY_CODE);
+			} else {
+				//do nothing, default case will be handled
+			}
+			return true;
+		} else if (itemId == R.id.menu_opt_preferences) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Preferences","Preferences",1);
+			startActivity(item.getIntent());
+			return true;
+		} else if (itemId == R.id.menu_opt_about) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_AboutDialog","About",1);
+			showDialog(SharedPreferencesHelper.DIALOG_ABOUT);
+			return true;
+		} else {
+			if (item.getGroupId() == SharedPreferencesHelper.CHANNEL_SUBMENU_GROUP) {
+				// Kill the FeedTabActivity that started this FeedItemActivity, because tab channel id is now changing and won't be correct (won't be the initial FeedTabActivity channel id) if back button is pressed
+				setResult(RESULT_OK);
+				startActivity(item.getIntent());
+				//finish();
+				return true;
+			}
+		}
         return super.onOptionsItemSelected(item);
     }
     
@@ -373,85 +372,85 @@ public class FeedItemActivity extends Activity {
     	Intent intent = null;
     	long feedId = -1;
     	
-    	switch (menuItem.getItemId()) {
-    		case R.id.read_online:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_ReadOnline",item.getLink().toString(),1);
-    			startItemWebActivity();
-    			return true;
-    		case R.id.add_fav:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_AddFavorite",item.getLink().toString(),1);
-    			//item.favorite();
-    			values = new ContentValues();
-    	    	values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, DbSchema.ON);
-    	    	mDbFeedAdapter.updateItem(mItemId, values, null);
-    	    	favView.setImageResource(R.drawable.fav);
-    			Toast.makeText(this, R.string.add_fav_msg, Toast.LENGTH_SHORT).show();
-    			return true;
-    		case R.id.remove_fav:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_RemoveFavorite",item.getLink().toString(),1);
-    			//item.unfavorite();
-    			Date now = new Date();
-    			long diffTime = now.getTime() - item.getPubdate().getTime();
-    			long maxTime = SharedPreferencesHelper.getPrefMaxHours(this) * 60 * 60 * 1000; // Max hours expressed in milliseconds
-    			// test if item has expired
-    			if (maxTime > 0 && diffTime > maxTime) {
-	    			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    			builder.setMessage(R.string.remove_fav_confirmation)
-	    			       .setCancelable(false)
-	    			       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-	    			           public void onClick(DialogInterface dialog, int id) {
-									ContentValues values = new ContentValues();
-									values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, DbSchema.OFF);
-									ImageView favView = (ImageView) findViewById(R.id.fav);
-					    	    	favView.setImageResource(R.drawable.no_fav);
-									mDbFeedAdapter.updateItem(mItemId, values, null);
-									Toast.makeText(FeedItemActivity.this, R.string.remove_fav_msg, Toast.LENGTH_SHORT).show();
-	    			           }
-	    			       })
-	    			       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-	    			           public void onClick(DialogInterface dialog, int id) {
-	    			                dialog.cancel();
-	    			           }
-	    			       });
-	    			builder.create().show();
-    			} else {
-    				values = new ContentValues();
-        	    	values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, DbSchema.OFF);
-        	    	mDbFeedAdapter.updateItem(mItemId, values, null);
-	    	    	favView.setImageResource(R.drawable.no_fav);
-        			Toast.makeText(this, R.string.remove_fav_msg, Toast.LENGTH_SHORT).show();
-    			}
-    			return true;
-    		case R.id.next:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_NextItem",item.getLink().toString(),1);
-    			feedId = mDbFeedAdapter.getItemFeedId(mItemId);
-    			intent = new Intent(this, FeedItemActivity.class);
-    	        intent.putExtra(DbSchema.ItemSchema._ID, mDbFeedAdapter.getNextItemId(feedId, mItemId));
-    	        startActivity(intent);
-    	        finish();
-    			return true;
-    		case R.id.previous:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_PreviousItem",item.getLink().toString(),1);
-    			feedId = mDbFeedAdapter.getItemFeedId(mItemId);
-    			intent = new Intent(this, FeedItemActivity.class);
-    	        intent.putExtra(DbSchema.ItemSchema._ID, mDbFeedAdapter.getPreviousItemId(feedId, mItemId));
-    	        startActivity(intent);
-    	        finish();
-    			return true;
-    		case R.id.share:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_Share",item.getLink().toString(),1);
-    			item = mDbFeedAdapter.getItem(mItemId);
-    			if (item != null) {
-	    			Intent shareIntent = new Intent(Intent.ACTION_SEND);
-	                shareIntent.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.share_subject), getString(R.string.app_name)));
-	                shareIntent.putExtra(Intent.EXTRA_TEXT, item.getTitle() + " " + item.getLink().toString());
-	                shareIntent.setType("text/plain");
-	                startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
-    			}
-    			return true;
-    		default:
-    			return super.onContextItemSelected(menuItem);
-    	}
+    	int itemId = menuItem.getItemId();
+		if (itemId == R.id.read_online) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_ReadOnline",item.getLink().toString(),1);
+			startItemWebActivity();
+			return true;
+		} else if (itemId == R.id.add_fav) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_AddFavorite",item.getLink().toString(),1);
+			//item.favorite();
+			values = new ContentValues();
+			values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, DbSchema.ON);
+			mDbFeedAdapter.updateItem(mItemId, values, null);
+			favView.setImageResource(R.drawable.fav);
+			Toast.makeText(this, R.string.add_fav_msg, Toast.LENGTH_SHORT).show();
+			return true;
+		} else if (itemId == R.id.remove_fav) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_RemoveFavorite",item.getLink().toString(),1);
+			//item.unfavorite();
+			Date now = new Date();
+			long diffTime = now.getTime() - item.getPubdate().getTime();
+			long maxTime = SharedPreferencesHelper.getPrefMaxHours(this) * 60 * 60 * 1000; // Max hours expressed in milliseconds
+			// test if item has expired
+			if (maxTime > 0 && diffTime > maxTime) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.remove_fav_confirmation)
+				       .setCancelable(false)
+				       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+								ContentValues values = new ContentValues();
+								values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, DbSchema.OFF);
+								ImageView favView = (ImageView) findViewById(R.id.fav);
+				    	    	favView.setImageResource(R.drawable.no_fav);
+								mDbFeedAdapter.updateItem(mItemId, values, null);
+								Toast.makeText(FeedItemActivity.this, R.string.remove_fav_msg, Toast.LENGTH_SHORT).show();
+				           }
+				       })
+				       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+				           public void onClick(DialogInterface dialog, int id) {
+				                dialog.cancel();
+				           }
+				       });
+				builder.create().show();
+			} else {
+				values = new ContentValues();
+				values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, DbSchema.OFF);
+				mDbFeedAdapter.updateItem(mItemId, values, null);
+				favView.setImageResource(R.drawable.no_fav);
+				Toast.makeText(this, R.string.remove_fav_msg, Toast.LENGTH_SHORT).show();
+			}
+			return true;
+		} else if (itemId == R.id.next) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_NextItem",item.getLink().toString(),1);
+			feedId = mDbFeedAdapter.getItemFeedId(mItemId);
+			intent = new Intent(this, FeedItemActivity.class);
+			intent.putExtra(DbSchema.ItemSchema._ID, mDbFeedAdapter.getNextItemId(feedId, mItemId));
+			startActivity(intent);
+			finish();
+			return true;
+		} else if (itemId == R.id.previous) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_PreviousItem",item.getLink().toString(),1);
+			feedId = mDbFeedAdapter.getItemFeedId(mItemId);
+			intent = new Intent(this, FeedItemActivity.class);
+			intent.putExtra(DbSchema.ItemSchema._ID, mDbFeedAdapter.getPreviousItemId(feedId, mItemId));
+			startActivity(intent);
+			finish();
+			return true;
+		} else if (itemId == R.id.share) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"ContextMenu_Share",item.getLink().toString(),1);
+			item = mDbFeedAdapter.getItem(mItemId);
+			if (item != null) {
+				Intent shareIntent = new Intent(Intent.ACTION_SEND);
+			    shareIntent.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.share_subject), getString(R.string.app_name)));
+			    shareIntent.putExtra(Intent.EXTRA_TEXT, item.getTitle() + " " + item.getLink().toString());
+			    shareIntent.setType("text/plain");
+			    startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
+			}
+			return true;
+		} else {
+			return super.onContextItemSelected(menuItem);
+		}
     }
     
     @Override

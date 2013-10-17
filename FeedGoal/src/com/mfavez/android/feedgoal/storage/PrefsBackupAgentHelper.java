@@ -29,7 +29,7 @@ import android.app.backup.SharedPreferencesBackupHelper;
  * - preferences.xml used in FeedPrefActivity (Setting Activity)
  */
 public class PrefsBackupAgentHelper extends BackupAgentHelper {
-	private static final String LOG_TAG = "PrefsBackupAgentHelper";
+	// private static final String LOG_TAG = "PrefsBackupAgentHelper";
 	
 	// The name of the file corresponding to FeedPrefActivity
     static final String PREFS_ACTIVITY_ENDING_COMMON_FILE_NAME = "_" + "preferences";

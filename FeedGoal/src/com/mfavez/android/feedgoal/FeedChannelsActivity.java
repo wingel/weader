@@ -56,7 +56,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.google.ads.AdRequest;
-import com.google.ads.AdView;
 import com.mfavez.android.feedgoal.common.Feed;
 import com.mfavez.android.feedgoal.common.TrackerAnalyticsHelper;
 import com.mfavez.android.feedgoal.storage.DbFeedAdapter;
@@ -192,18 +191,18 @@ public class FeedChannelsActivity extends Activity implements OnItemClickListene
     }
     
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-	        case R.id.menu_opt_preferences:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Preferences","Preferences",1);
-	        	startActivity(item.getIntent());
-	            return true;
-	        case R.id.menu_opt_about:
-	        	TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_AboutDialog","About",1);
-	        	showDialog(SharedPreferencesHelper.DIALOG_ABOUT);
-	            return true;
-	        default:
-	        	return super.onOptionsItemSelected(item);
-	    }
+        int itemId = item.getItemId();
+		if (itemId == R.id.menu_opt_preferences) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_Preferences","Preferences",1);
+			startActivity(item.getIntent());
+			return true;
+		} else if (itemId == R.id.menu_opt_about) {
+			TrackerAnalyticsHelper.trackEvent(this,LOG_TAG,"OptionMenu_AboutDialog","About",1);
+			showDialog(SharedPreferencesHelper.DIALOG_ABOUT);
+			return true;
+		} else {
+			return super.onOptionsItemSelected(item);
+		}
     }
     
     public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -223,13 +222,13 @@ public class FeedChannelsActivity extends Activity implements OnItemClickListene
     public boolean onContextItemSelected(MenuItem menuItem) {
     	final AdapterContextMenuInfo acmi = (AdapterContextMenuInfo) menuItem.getMenuInfo();
     	Feed feed = mDbFeedAdapter.getFeed(acmi.id);
-    	switch (menuItem.getItemId()) {
-    		case R.id.remove_channel:
-	        	removeChannel(feed.getId());
-    			return true;
-    		default:
-    			return super.onContextItemSelected(menuItem);
-    	}
+    	int itemId = menuItem.getItemId();
+		if (itemId == R.id.remove_channel) {
+			removeChannel(feed.getId());
+			return true;
+		} else {
+			return super.onContextItemSelected(menuItem);
+		}
     }
     
     @Override

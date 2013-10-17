@@ -37,7 +37,7 @@ import com.mfavez.android.feedgoal.storage.SharedPreferencesHelper;
  */
 public class SplashScreenActivity extends Activity {
 	
-	private static final String LOG_TAG = "SplashScreenActivity";
+	// private static final String LOG_TAG = "SplashScreenActivity";
 	private final Handler mHandler = new Handler();
  
     private final Runnable mPendingLauncherRunnable = new Runnable() {

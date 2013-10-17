@@ -38,7 +38,7 @@ import com.mobclix.android.sdk.Mobclix;
  */
 public final class TrackerAnalyticsHelper {
 	
-	private static final String LOG_TAG = "TrackerAnalyticsHelper";
+	// private static final String LOG_TAG = "TrackerAnalyticsHelper";
 	
 	private static GoogleAnalyticsTracker tracker;
 	

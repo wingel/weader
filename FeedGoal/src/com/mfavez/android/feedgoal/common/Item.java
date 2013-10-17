@@ -34,7 +34,7 @@ import com.mfavez.android.feedgoal.storage.DbSchema;
  * Created 15/04/2010
  */
 public class Item {
-	private static final String LOG_TAG = "Item";
+	// private static final String LOG_TAG = "Item";
 	
 	private long mId = -1;
 	private URL mLink;

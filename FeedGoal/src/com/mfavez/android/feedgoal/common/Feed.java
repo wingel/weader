@@ -34,7 +34,7 @@ import com.mfavez.android.feedgoal.storage.DbSchema;
  * Created 15/04/2010
  */
 public class Feed {
-	private static final String LOG_TAG = "Feed";
+	// private static final String LOG_TAG = "Feed";
 	
 	public static final String TYPE_RDF = "rdf";
 	public static final String TYPE_RSS = "rss";
