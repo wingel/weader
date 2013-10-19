@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" 
+	android:layout_height="match_parent"
+	android:orientation="horizontal"
+	android:padding="5dp">
+	<TextView 
+		android:id="@+id/title"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:singleLine="true"
+        android:ellipsize="marquee"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+		android:textSize="18dp"
+    	android:textColor="@color/color2"/>
+	<Button 
+   		android:id="@+id/button_delete_channel"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="0"
+		android:gravity="right"
+		android:focusable="false"
+		android:textSize="18dp"
+		android:textStyle="bold"
+		android:textColor="@color/red"
+		android:text="X"/>
+</LinearLayout>

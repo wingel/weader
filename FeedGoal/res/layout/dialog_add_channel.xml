@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/dialog_add_channel"
+	    android:orientation="vertical"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:padding="10dp">
+	<TextView android:id="@+id/dialog_title"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/second_color"
+		    android:layout_marginBottom="10dp"
+		    android:text="@string/channel_add_dialog"/>
+	<EditText android:id="@+id/dialog_input"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:lines="1"
+		    android:inputType="textUri"
+		    android:hint="@string/channel_add_dialog_url_hint"/>	
+</LinearLayout>

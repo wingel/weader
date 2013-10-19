@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_max_items_labels">
+    	<item>5 articoli</item>
+        <item>10 articoli</item>
+        <item>20 articoli</item>
+        <item>30 articoli</item>
+        <item>50 articoli</item>
+    </string-array>
+    <string-array name="pref_item_view_labels">
+    	<item>Offline</item>
+        <item>Online</item>
+    </string-array>
+    <string-array name="pref_max_hours_labels">
+    	<item>mai</item>
+        <item>dopo 1 giorno</item>
+        <item>dopo 2 giorni</item>
+        <item>dopo 1 settimana</item>
+        <item>dopo 1 mese</item>
+    </string-array>
+    <string-array name="pref_update_period_labels">
+    	<item>mai, aggiornare manualmente</item>
+    	<item>dopo 5 minuti</item>
+    	<item>dopo 15 minuti</item>
+    	<item>dopo 30 minuti</item>
+    	<item>dopo 1 ora</item>
+        <item>dopo 4 ore</item>
+        <item>dopo 8 ore</item>
+        <item>dopo 1 giorno</item>
+        <item>dopo 2 giorni</item>
+        <item>dopo 1 settimana</item>
+    </string-array>
+</resources>

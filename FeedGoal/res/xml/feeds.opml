@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<opml version="1.0">
+    <head>
+        <title>FeedGoal Subscriptions</title>
+    </head>
+    <body>
+    	<outline text="Android Developers Blog" title="Android Developers Blog" htmlUrl="http://android-developers.blogspot.com" xmlUrl="http://feeds.feedburner.com/blogspot/hsDu" type="atom"/>
+    </body>
+</opml>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * Copyright (C) 2010-2011 Mathieu Favez - http://mfavez.com
+ *
+ *
+ * This file is part of FeedGoal - http://feedgoal.org
+ * 
+ * FeedGoal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeedGoal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with FeedGoal.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.mfavez.android.feedgoal"
+      android:installLocation="auto"
+      android:versionCode="20"
+      android:versionName="1.6.3">
+    <supports-screens/>
+    <application android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:backupAgent="com.mfavez.android.feedgoal.storage.PrefsBackupAgentHelper">
+    	<activity android:name=".SplashScreenActivity" android:label="@string/app_name">
+    		<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".FeedTabActivity" android:label="@string/app_name" android:configChanges="orientation"/>
+        <activity android:name=".FeedWebActivity" android:label="@string/app_name"/>
+        <activity android:name=".FeedItemActivity" android:label="@string/app_name"/>
+        <activity android:name=".FeedChannelsActivity" android:label="@string/app_name">
+            <!-- Intent filters to handle clicks on external RSS buttons/links (for instance: a RSS button in a browser). It allows to add the feed as a new channel in one click - Must only be used if dynamic_mode=true -->
+			<!-- 
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data android:scheme="http"/>
+			    <data android:host="*"/>
+				<data android:pathPattern=".*\\.xml"/>
+				<data android:pathPattern=".*\\.rss"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data android:scheme="http"/>
+			    <data android:host="feeds.feedburner.com"/>
+				<data android:host="feeds2.feedburner.com"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data android:scheme="http"/>
+				<data android:mimeType="text/xml"/>
+				<data android:mimeType="application/rss+xml"/>
+				<data android:mimeType="application/atom+xml"/>
+				<data android:mimeType="application/xml"/>
+			</intent-filter>
+			-->
+        </activity>
+        <activity android:name=".FeedPrefActivity" android:label="@string/pref_name"/>
+        <meta-data android:name="com.google.android.backup.api_key" android:value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+        <meta-data android:name="splash_screen_duration" android:value="2000"/>
+        <meta-data android:name="dynamic_mode" android:value="false"/>
+        <meta-data android:name="show_update_startup_dialog" android:value="false"/>
+		<!-- AdMob Activity definition -->
+		<!-- 
+		<activity android:name="com.google.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation"/>
+		-->
+		<!-- The application's publisher ID assigned by Mobclix -->
+		<!-- 
+		<meta-data android:name="com.mobclix.APPLICATION_ID" android:value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+		<activity android:name="com.mobclix.android.sdk.MobclixBrowserActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+		-->
+		<!-- The API Key assigned by Flurry -->
+		<!--
+		<meta-data android:name="FLURRY_API_KEY" android:value="xxxxxxxxxxxxxxxxxxxx"/>
+		-->
+		<!-- The profile ID assigned by Google Analytics -->
+		<!--
+		<meta-data android:name="GOOGLE_ANALYTICS_PROFILE_ID" android:value="UA-xxxxxx-xx"/>
+		-->
+		<!-- Used for install referrer tracking with Google Analytics-->
+		<!--
+		<receiver android:name="com.google.android.apps.analytics.AnalyticsReceiver" android:exported="true">
+			<intent-filter>
+		    	<action android:name="com.android.vending.INSTALL_REFERRER" />
+			</intent-filter>
+		</receiver>
+		-->
+    </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Mobclix Required Permissions -->
+    <!-- 
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+	-->
+	<!-- Optional permissions for Mobclix geo-targeted ads, Flurry advanced geo-analytics -->
+    <!--
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    -->
+    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="10"/>
+</manifest> 
