@@ -6,7 +6,6 @@ while read dir size; do
 	       --export-width=$size --export-height=$size \
 	       logo.svg
 done <<EOF
-../res/drawable 48
 ../res/drawable-ldpi 36
 ../res/drawable-mdpi 48
 ../res/drawable-hdpi 72
