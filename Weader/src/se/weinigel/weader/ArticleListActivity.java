@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,20 +77,19 @@ public class ArticleListActivity extends FragmentActivity {
 				ArticlePagerActivity.ARTICLE_SELECTED);
 		articleSelectedFilter.addCategory(Intent.CATEGORY_DEFAULT);
 		articleSelectedReceiver = new ArticleSelectedReceiver();
-		registerReceiver(articleSelectedReceiver, articleSelectedFilter);
+		registerLocalReceiver(articleSelectedReceiver, articleSelectedFilter);
 
 		IntentFilter updateServiceFilter = new IntentFilter(
 				UpdateFeedService.RESPONSE_ACTION);
 		updateServiceFilter.addCategory(Intent.CATEGORY_DEFAULT);
 		updateServiceReceiver = new UpdateFeedServiceReceiver();
-		registerReceiver(updateServiceReceiver, updateServiceFilter);
-
+		registerLocalReceiver(updateServiceReceiver, updateServiceFilter);
 	}
 
 	@Override
 	protected void onDestroy() {
-		unregisterReceiver(articleSelectedReceiver);
-		unregisterReceiver(updateServiceReceiver);
+		unregisterLocalReceiver(articleSelectedReceiver);
+		unregisterLocalReceiver(updateServiceReceiver);
 		super.onDestroy();
 	}
 
@@ -252,5 +252,15 @@ public class ArticleListActivity extends FragmentActivity {
 
 	public void updateUi() {
 		setProgressBarIndeterminateVisibility(!busy.isEmpty());
+	}
+
+	private void registerLocalReceiver(BroadcastReceiver receiver,
+			IntentFilter filter) {
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+				filter);
+	}
+
+	private void unregisterLocalReceiver(BroadcastReceiver receiver) {
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 	}
 }

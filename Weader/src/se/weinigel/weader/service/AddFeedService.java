@@ -8,6 +8,7 @@ import se.weinigel.weader.contract.WeadContract;
 import android.app.IntentService;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.mfavez.android.feedgoal.FeedHandler;
@@ -101,6 +102,6 @@ public class AddFeedService extends IntentService {
 		intent.addCategory(Intent.CATEGORY_DEFAULT);
 		intent.putExtra(WeadContract.Feed.COLUMN_URL, uri);
 		intent.putExtra(RESPONSE, response);
-		sendBroadcast(intent);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 }

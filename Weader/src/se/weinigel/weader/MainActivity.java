@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -31,7 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FeedListActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity {
 	private final String LOG_TAG = getClass().getSimpleName();
 
 	private FeedListAdapter mListAdapter;
@@ -83,7 +84,7 @@ public class FeedListActivity extends FragmentActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
-				Intent intent = new Intent(FeedListActivity.this,
+				Intent intent = new Intent(MainActivity.this,
 						ArticleListActivity.class);
 				intent.putExtra(WeadContract.Article.COLUMN_ID, id);
 				startActivity(intent);
@@ -93,7 +94,7 @@ public class FeedListActivity extends FragmentActivity {
 		if (Intent.ACTION_VIEW.equals(intent.getAction())
 				&& intent.getData() != null) {
 			Log.d(LOG_TAG, "add request " + intent.getData());
-			Intent addIntent = new Intent(FeedListActivity.this,
+			Intent addIntent = new Intent(MainActivity.this,
 					AddFeedService.class);
 			addIntent.setData(intent.getData());
 			startService(addIntent);
@@ -103,19 +104,19 @@ public class FeedListActivity extends FragmentActivity {
 				UpdateFeedService.RESPONSE_ACTION);
 		updateServiceFilter.addCategory(Intent.CATEGORY_DEFAULT);
 		updateServiceReceiver = new UpdateFeedServiceReceiver();
-		registerReceiver(updateServiceReceiver, updateServiceFilter);
+		registerLocalReceiver(updateServiceReceiver, updateServiceFilter);
 
 		IntentFilter addServiceFilter = new IntentFilter(
 				AddFeedService.RESPONSE_ACTION);
 		addServiceFilter.addCategory(Intent.CATEGORY_DEFAULT);
 		addServiceReceiver = new AddFeedServiceReceiver();
-		registerReceiver(addServiceReceiver, addServiceFilter);
+		registerLocalReceiver(addServiceReceiver, addServiceFilter);
 	}
 
 	@Override
 	protected void onDestroy() {
-		unregisterReceiver(addServiceReceiver);
-		unregisterReceiver(updateServiceReceiver);
+		unregisterLocalReceiver(addServiceReceiver);
+		unregisterLocalReceiver(updateServiceReceiver);
 		super.onDestroy();
 	}
 
@@ -223,7 +224,7 @@ public class FeedListActivity extends FragmentActivity {
 
 			protected void onPostExecute(Void result) {
 				CharSequence text = "Feed deleted";
-				Toast toast = Toast.makeText(FeedListActivity.this, text,
+				Toast toast = Toast.makeText(MainActivity.this, text,
 						Toast.LENGTH_SHORT);
 				toast.show();
 				updateList();
@@ -295,7 +296,7 @@ public class FeedListActivity extends FragmentActivity {
 					text = "Error while fetching feed";
 				else if (AddFeedService.RESPONSE_ADDED.equals(response))
 					text = "Feed added";
-				Toast toast = Toast.makeText(FeedListActivity.this, text,
+				Toast toast = Toast.makeText(MainActivity.this, text,
 						Toast.LENGTH_SHORT);
 				toast.show();
 
@@ -303,5 +304,15 @@ public class FeedListActivity extends FragmentActivity {
 				updateList();
 			}
 		}
+	}
+
+	private void registerLocalReceiver(BroadcastReceiver receiver,
+			IntentFilter filter) {
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+				filter);
+	}
+
+	private void unregisterLocalReceiver(BroadcastReceiver receiver) {
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 	}
 }
