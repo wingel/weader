@@ -39,7 +39,7 @@
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
         android:paddingTop="20sp"
-        android:src="@drawable/logo" android:contentDescription="@string/logotype"/>
+        android:src="@drawable/ic_launcher" android:contentDescription="@string/logotype"/>
 
     <TextView
         android:id="@+id/copying"
