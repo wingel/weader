@@ -56,6 +56,7 @@
         </activity>
         <activity
             android:name="se.weinigel.weader.ArticleListActivity"
+            android:exported="false"
             android:configChanges="orientation"
             android:label="@string/title_activity_item_list" >
 
@@ -69,6 +70,7 @@
         </activity>
         <activity
             android:name="se.weinigel.weader.ArticlePagerActivity"
+            android:exported="false"
             android:configChanges="orientation"
             android:label="@string/title_activity_pager" >
 
@@ -82,6 +84,7 @@
         </activity>
         <activity
             android:name="se.weinigel.weader.ImageViewActivity"
+            android:exported="false"
             android:configChanges="orientation"
             android:label="ImageViewActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
