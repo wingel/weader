@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="se.weinigel.weader.FeedListActivity"
+            android:name="se.weinigel.weader.MainActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_feed_list" >
             <intent-filter>
