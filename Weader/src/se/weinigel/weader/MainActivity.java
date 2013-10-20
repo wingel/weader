@@ -1,6 +1,9 @@
 package se.weinigel.weader;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.AddFeedService;
 import se.weinigel.weader.service.UpdateFeedService;
@@ -11,9 +14,12 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -57,16 +63,7 @@ public class MainActivity extends FragmentActivity {
 
 		Intent intent = getIntent();
 
-		if (intent != null) {
-			Log.d(LOG_TAG, "action " + intent.getAction());
-			Log.d(LOG_TAG, "type " + intent.getType());
-			Log.d(LOG_TAG, "data " + intent.getData());
-			if (intent.getData() != null)
-				Log.d(LOG_TAG, "data scheme " + intent.getData().getScheme());
-			Log.d(LOG_TAG, "categories " + intent.getCategories());
-		} else {
-			Log.d(LOG_TAG, "null intent");
-		}
+		Helper.dumpIntent(intent);
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
@@ -357,5 +354,91 @@ public class MainActivity extends FragmentActivity {
 
 	private void unregisterLocalReceiver(BroadcastReceiver receiver) {
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+	}
+
+	/**
+	 * Start another activity to handle web pages.
+	 * 
+	 * When a user clicks on a link in an article, the intent for the article
+	 * might match Weader's own intent filters so that Weader would be asked to
+	 * add the link target as a feed. That is probably not what we want, so try
+	 * to filter the list of intents and make sure that we start a real browser
+	 * instead. This is ugly and fragile but it seems to work decently.
+	 */
+	public static void startBrowserActivity(Context context, Intent intent) {
+		final String LOG_TAG = "startBrowserActivity";
+
+		Helper.dumpIntent(intent);
+
+		// Start by finding an Activity that will handle normal web pages.
+		Intent genericBrowserIntent = new Intent(Intent.ACTION_VIEW,
+				Uri.parse("http://example.com/"));
+		ResolveInfo browserInfo = context.getPackageManager().resolveActivity(
+				genericBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY);
+		Log.d(LOG_TAG, "browser  " + browserInfo.activityInfo.packageName);
+
+		// Exclude our the package for Weader
+		final String exclude = MainActivity.class.getPackage().getName();
+
+		Intent newIntent = null;
+		List<Intent> possibleIntents = new ArrayList<Intent>();
+
+		/*
+		 * Find all possible activities that can handle the actual intent.
+		 * 
+		 * If we find an activity matching the activity for normal web pages,
+		 * that should be the default browser, so create a new intent using that
+		 * activity and break out of the loop.
+		 * 
+		 * Otherwise, fill in possibleIntents with an intent for each activity,
+		 * excluding ourselves.
+		 */
+		List<ResolveInfo> possibleInfos = context.getPackageManager()
+				.queryIntentActivities(intent,
+						PackageManager.MATCH_DEFAULT_ONLY);
+		for (ResolveInfo resolveInfo : possibleInfos) {
+			String packageName = resolveInfo.activityInfo.packageName;
+
+			if (packageName.equals(exclude)) {
+				Log.d(LOG_TAG, "ignoring " + packageName);
+				continue;
+			}
+
+			if (browserInfo.activityInfo.packageName.equals(packageName)) {
+				Log.d(LOG_TAG, "using default " + packageName);
+
+				newIntent = new Intent(intent);
+				newIntent.setPackage(packageName);
+				break;
+			}
+
+			Log.d(LOG_TAG, "including " + packageName);
+
+			Intent targetedIntent = new Intent(intent);
+			targetedIntent.setPackage(packageName);
+
+			possibleIntents.add(targetedIntent);
+		}
+
+		// No default activity found, start a chooser with all possible intents.
+		if (newIntent == null) {
+			if (possibleIntents.isEmpty()) {
+				Log.d(LOG_TAG, "no other activities to choose from");
+				return;
+			}
+
+			if (possibleIntents.size() == 1) {
+				Log.d(LOG_TAG, "only one activity to choose from");
+				context.startActivity(possibleIntents.get(0));
+				return;
+			}
+
+			newIntent = Intent.createChooser(
+					possibleIntents.remove(possibleIntents.size() - 1), null);
+			newIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+					possibleIntents.toArray(new Parcelable[] {}));
+		}
+
+		context.startActivity(newIntent);
 	}
 }

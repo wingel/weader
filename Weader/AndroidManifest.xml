@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="se.weinigel.weader"
     android:versionCode="1"
-    android:versionName="1.0" xmlns:tools="http://schemas.android.com/tools">
+    android:versionName="1.0" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -27,38 +28,115 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+                 The following intent catches the feed URI scheme as
+                 documented at:
+                 http://en.wikipedia.org/wiki/Feed_URI_scheme
+            -->
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="feed" />
+            </intent-filter>
+
+            <!--
+                 The following intent filter is supposed to catch when
+                 the browser receives a file with "Content-type:
+                 atom+xml" header.  Unfortunately it doesn't work, it
+                 seems that anything the browser can handle internally
+                 it will, so anything with xml as the content type
+                 will be displayed in the browser, even though there
+                 is a more exact intent registered.
+
+                 I'm keeping this intent-filter as documentation and
+                 because maybe the Android browser/Chrome will start
+                 doing the right thing in the future.
+
+                 Since the Android browser won't send out intents
+                 based on xml mime types we have to resort to other
+                 more fragile ways of detecting feeds such looking at
+                 the hostname or path and hoping they're right.
+            -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
+                <data android:scheme="http" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="application/rss+xml" />
+                <data android:mimeType="application/atom+xml" />
+            </intent-filter>
+
+            <!--
+                 The following intent matches on the hostnames used by
+                 the google/feedburner proxies.  This should be safe.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:host="feeds.feedburner.com" />
+                <data android:host="feeds2.feedburner.com" />
+                <data android:host="feedproxy.google.com" />
+                <data android:host="feedsproxy.google.com" />
+            </intent-filter>
+
+            <!--
+                 Try to identify feeds based on the path.  This is
+                 rather fragile and sometimes we get false matches.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+
+                <!--
+                     Wordpress mostly seems to use /feed/ at the start
+                     of the path
+                -->
                 <data
                     android:host="*"
-                    android:pathPattern=".*xml"
-                    android:scheme="http" />
+                    android:pathPattern=".*feed.*" />
+
+                <!-- Blogger always uses /feeds/ at the start of the path -->
                 <data
                     android:host="*"
-                    android:pathPattern=".*rss"
-                    android:scheme="http" />
+                    android:pathPattern=".*feeds.*" />
+
+		<!-- Try a few more patterns -->
                 <data
                     android:host="*"
-                    android:pathPattern=".*feed.*"
-                    android:scheme="http" />
+                    android:pathPattern=".*xml" />
                 <data
                     android:host="*"
-                    android:pathPattern=".*rss.*"
-                    android:scheme="http" />
+                    android:pathPattern=".*rss" />
                 <data
                     android:host="*"
-                    android:pathPattern=".*RSS.*"
-                    android:scheme="http" />
+                    android:pathPattern=".*RSS" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*atom" />
             </intent-filter>
         </activity>
         <activity
             android:name="se.weinigel.weader.ArticleListActivity"
-            android:exported="false"
             android:configChanges="orientation"
+            android:exported="false"
             android:label="@string/title_activity_item_list" >
 
             <!--
@@ -71,8 +149,8 @@
         </activity>
         <activity
             android:name="se.weinigel.weader.ArticlePagerActivity"
-            android:exported="false"
             android:configChanges="orientation"
+            android:exported="false"
             android:label="@string/title_activity_pager" >
 
             <!--
@@ -85,8 +163,8 @@
         </activity>
         <activity
             android:name="se.weinigel.weader.ImageViewActivity"
-            android:exported="false"
             android:configChanges="orientation"
+            android:exported="false"
             android:label="ImageViewActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         </activity>

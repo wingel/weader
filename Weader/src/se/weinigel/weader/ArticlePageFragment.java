@@ -227,7 +227,7 @@ public class ArticlePageFragment extends Fragment implements
 
 					Uri uri = Uri.parse(mLink);
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
-					startActivity(browserIntent);
+					MainActivity.startBrowserActivity(getActivity(), browserIntent);
 				}
 			});
 		}
@@ -369,7 +369,7 @@ public class ArticlePageFragment extends Fragment implements
 				intent.setData(Uri.parse(url));
 			}
 
-			startActivity(intent);
+			MainActivity.startBrowserActivity(getActivity(), intent);
 			return true;
 		}
 
