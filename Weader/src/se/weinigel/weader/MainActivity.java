@@ -1,8 +1,6 @@
 package se.weinigel.weader;
 
 import java.util.HashSet;
-
-import se.weinigel.weader.R;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.AddFeedService;
 import se.weinigel.weader.service.UpdateFeedService;
@@ -26,8 +24,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,13 +91,10 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 
-		if (Intent.ACTION_VIEW.equals(intent.getAction())
-				&& intent.getData() != null) {
-			Log.d(LOG_TAG, "add request " + intent.getData());
-			Intent addIntent = new Intent(MainActivity.this,
-					AddFeedService.class);
-			addIntent.setData(intent.getData());
-			startService(addIntent);
+		Uri uri = intent.getData();
+		if (Intent.ACTION_VIEW.equals(intent.getAction()) && uri != null) {
+			Log.d(LOG_TAG, "add request " + uri);
+			addFeed(uri, false);
 		}
 
 		IntentFilter updateServiceFilter = new IntentFilter(
@@ -111,6 +108,14 @@ public class MainActivity extends FragmentActivity {
 		addServiceFilter.addCategory(Intent.CATEGORY_DEFAULT);
 		addServiceReceiver = new AddFeedServiceReceiver();
 		registerLocalReceiver(addServiceReceiver, addServiceFilter);
+	}
+
+	private void addFeed(Uri uri, boolean fuzzy) {
+		Intent addIntent = new Intent(MainActivity.this, AddFeedService.class);
+		addIntent.setData(uri);
+		if (fuzzy)
+			addIntent.putExtra(AddFeedService.EXTRA_FUZZY, fuzzy);
+		startService(addIntent);
 	}
 
 	@Override
@@ -148,6 +153,9 @@ public class MainActivity extends FragmentActivity {
 		switch (item.getItemId()) {
 		case R.id.action_refresh:
 			startRefreshAll();
+			return false;
+		case R.id.action_add_feed:
+			onAddFeed();
 			return false;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -206,6 +214,41 @@ public class MainActivity extends FragmentActivity {
 		default:
 			return super.onContextItemSelected(item);
 		}
+	}
+
+	private void onAddFeed() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.add_feed_title);
+		builder.setMessage(R.string.add_feed_message);
+
+		// Use an EditText view to get user input.
+		final EditText input = new EditText(this);
+		input.setId(View.NO_ID);
+		input.setHint(R.string.add_feed_uri);
+		input.setInputType(EditorInfo.TYPE_TEXT_VARIATION_URI);
+		builder.setView(input);
+
+		builder.setPositiveButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString();
+						Log.d(LOG_TAG, "Add feed: " + value);
+						addFeed(Uri.parse(value), true);
+						return;
+					}
+				});
+
+		builder.setNegativeButton(android.R.string.cancel,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	protected void deleteFeed(final long feedId) {
@@ -289,13 +332,13 @@ public class MainActivity extends FragmentActivity {
 			} else {
 				addFeedBusy.remove(uri);
 
-				String text = "Unknown response when adding feed";
+				int text = R.string.add_feed_unknown;
 				if (AddFeedService.RESPONSE_EXISTS.equals(response))
-					text = "Feed already exists";
+					text = R.string.add_feed_exists;
 				else if (AddFeedService.RESPONSE_ERROR.equals(response))
-					text = "Error while fetching feed";
+					text = R.string.add_feed_failed;
 				else if (AddFeedService.RESPONSE_ADDED.equals(response))
-					text = "Feed added";
+					text = R.string.add_feed_ok;
 				Toast toast = Toast.makeText(MainActivity.this, text,
 						Toast.LENGTH_SHORT);
 				toast.show();

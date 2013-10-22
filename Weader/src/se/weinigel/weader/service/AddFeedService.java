@@ -1,5 +1,6 @@
 package se.weinigel.weader.service;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +18,8 @@ import com.mfavez.android.feedgoal.storage.DbFeedAdapter;
 
 public class AddFeedService extends IntentService {
 	private static final String LOG_TAG = AddFeedService.class.getSimpleName();
+
+	public static final String EXTRA_FUZZY = "fuzzy";
 
 	public static final String RESPONSE_ACTION = AddFeedService.class.getName()
 			+ ".RESPONSE_ACTION";
@@ -53,10 +56,13 @@ public class AddFeedService extends IntentService {
 			Log.w(LOG_TAG, "handleIntent without an URI");
 			return;
 		}
-		addFeed(uri);
+
+		boolean fuzzy = intent.getBooleanExtra(EXTRA_FUZZY, false);
+
+		addFeed(uri, fuzzy);
 	}
 
-	private void addFeed(Uri uri) {
+	private void addFeed(Uri uri, boolean fuzzy) {
 		mDbFeedAdapter.open();
 
 		respond(uri, RESPONSE_START);
@@ -69,6 +75,7 @@ public class AddFeedService extends IntentService {
 				existing.add(feed.getURL().toString());
 
 			String url = uri.toString();
+
 			if (existing.contains(url)) {
 				respond(uri, RESPONSE_EXISTS);
 				return;
@@ -77,7 +84,34 @@ public class AddFeedService extends IntentService {
 			FeedHandler feedHandler = new FeedHandler(this);
 
 			Log.d(LOG_TAG, "fetching new feed from " + url);
-			Feed feed = feedHandler.handleFeed(new URL(url));
+			URL url2;
+			try {
+				url2 = new URL(url);
+			} catch (MalformedURLException e) {
+				if (!fuzzy)
+					throw e;
+				url = "http://" + url;
+				url2 = new URL(url);
+			}
+
+			Feed feed;
+			try {
+				feed = feedHandler.handleFeed(url2);
+			} catch (Exception e) {
+				if (!fuzzy)
+					throw e;
+
+				url2 = new URL(url + "/feeds/posts/default");
+				try {
+					feed = feedHandler.handleFeed(url2);
+				} catch (Exception e2) {
+					if (!fuzzy)
+						throw e2;
+
+					url2 = new URL(url + "/feed/");
+					feed = feedHandler.handleFeed(url2);
+				}
+			}
 
 			Log.d(LOG_TAG, "feed title " + feed.getTitle());
 
