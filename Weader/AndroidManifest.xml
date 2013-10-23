@@ -91,6 +91,10 @@
                 <data android:host="feedproxy.google.com" />
                 <data android:host="feedsproxy.google.com" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="se.weinigel.weader.AddFeedActivity"
+            android:label="@string/app_name" >
 
             <!--
                  Try to identify feeds based on the path.  This is
@@ -118,7 +122,7 @@
                     android:host="*"
                     android:pathPattern=".*feeds.*" />
 
-		<!-- Try a few more patterns -->
+                <!-- Try a few more patterns -->
                 <data
                     android:host="*"
                     android:pathPattern=".*xml" />
