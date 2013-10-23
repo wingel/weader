@@ -38,7 +38,7 @@ import com.mfavez.android.feedgoal.storage.SharedPreferencesHelper;
  * Created 15/04/2010
  */
 public class FeedPrefActivity extends PreferenceActivity {
-	private static final String LOG_TAG = "FeedPrefActivity";
+	// private static final String LOG_TAG = "FeedPrefActivity";
 	
 	public static final String PREF_START_CHANNEL_KEY = "startChannel";
 	public static final String PREF_ITEM_VIEW_KEY = "itemView";
