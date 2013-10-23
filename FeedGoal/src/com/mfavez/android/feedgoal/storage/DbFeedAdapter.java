@@ -47,7 +47,6 @@ import com.mfavez.android.feedgoal.R;
 import com.mfavez.android.feedgoal.common.Enclosure;
 import com.mfavez.android.feedgoal.common.Feed;
 import com.mfavez.android.feedgoal.common.Item;
-import com.mfavez.android.feedgoal.common.TrackerAnalyticsHelper;
 
 /**
  * Provides database access and query methods.
@@ -90,15 +89,12 @@ public class DbFeedAdapter {
             } catch(XmlPullParserException xppe) {
                 Log.e(LOG_TAG,"",xppe);
                 errorId = errorId + 1;
-        		TrackerAnalyticsHelper.trackError(mDbfa.mCtx, Long.toString(errorId), xppe.getMessage(), LOG_TAG);
             } catch (MalformedURLException mue) {
                 Log.e(LOG_TAG,"",mue);
                 errorId = errorId + 1;
-        		TrackerAnalyticsHelper.trackError(mDbfa.mCtx, Long.toString(errorId), mue.getMessage(), LOG_TAG);
             } catch (IOException ioe) {
                 Log.e(LOG_TAG,"",ioe);
                 errorId = errorId + 1;
-        		TrackerAnalyticsHelper.trackError(mDbfa.mCtx, Long.toString(errorId), ioe.getMessage(), LOG_TAG);
             }
             db.execSQL(DbSchema.ItemSchema.CREATE_TABLE);
             db.execSQL(DbSchema.EnclosureSchema.CREATE_TABLE);
@@ -179,15 +175,12 @@ public class DbFeedAdapter {
             } catch(XmlPullParserException xppe) {
                 Log.e(LOG_TAG,"",xppe);
                 errorId = errorId + 1;
-        		TrackerAnalyticsHelper.trackError(mDbfa.mCtx, Long.toString(errorId), xppe.getMessage(), LOG_TAG);
             } catch (MalformedURLException mue) {
                 Log.e(LOG_TAG,"",mue);
                 errorId = errorId + 1;
-        		TrackerAnalyticsHelper.trackError(mDbfa.mCtx, Long.toString(errorId), mue.getMessage(), LOG_TAG);
             } catch (IOException ioe) {
                 Log.e(LOG_TAG,"",ioe);
                 errorId = errorId + 1;
-        		TrackerAnalyticsHelper.trackError(mDbfa.mCtx, Long.toString(errorId), ioe.getMessage(), LOG_TAG);
             }
         }
         
@@ -385,11 +378,9 @@ public class DbFeedAdapter {
 		} catch (FeedException fe) {
 			Log.e(LOG_TAG,"",fe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), fe.getMessage(), LOG_TAG);
     	} catch (MalformedURLException mue) {
 			Log.e(LOG_TAG,"",mue);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), mue.getMessage(), LOG_TAG);
 		}
 		
 		if (cursor != null)
@@ -517,7 +508,6 @@ public class DbFeedAdapter {
 		} catch (FeedException fe) {
 			Log.e(LOG_TAG,"",fe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), fe.getMessage(), LOG_TAG);
     	}
     	
     	if (cursor != null)
@@ -556,11 +546,9 @@ public class DbFeedAdapter {
 		} catch (FeedException fe) {
 			Log.e(LOG_TAG,"",fe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), fe.getMessage(), LOG_TAG);
     	} catch (MalformedURLException mue) {
 			Log.e(LOG_TAG,"",mue);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), mue.getMessage(), LOG_TAG);
 		}
     	
     	if (cursor != null)
@@ -626,7 +614,6 @@ public class DbFeedAdapter {
 		} catch (FeedException fe) {
 			Log.e(LOG_TAG,"",fe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), fe.getMessage(), LOG_TAG);
     	}
     	
     	if (cursor != null)
@@ -666,7 +653,6 @@ public class DbFeedAdapter {
 		} catch (FeedException fe) {
 			Log.e(LOG_TAG,"",fe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), fe.getMessage(), LOG_TAG);
     	}
     	
     	if (cursor != null)
@@ -912,11 +898,9 @@ public class DbFeedAdapter {
 		} catch (FeedException fe) {
 			Log.e(LOG_TAG,"",fe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), fe.getMessage(), LOG_TAG);
     	} catch (MalformedURLException mue) {
 			Log.e(LOG_TAG,"",mue);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(mCtx, Long.toString(errorId), mue.getMessage(), LOG_TAG);
 		}
     	
     	if (cursor != null)

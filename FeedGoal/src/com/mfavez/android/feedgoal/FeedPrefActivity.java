@@ -29,7 +29,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
 import com.mfavez.android.feedgoal.common.Feed;
-import com.mfavez.android.feedgoal.common.TrackerAnalyticsHelper;
 import com.mfavez.android.feedgoal.storage.DbFeedAdapter;
 import com.mfavez.android.feedgoal.storage.SharedPreferencesHelper;
 
@@ -69,16 +68,6 @@ public class FeedPrefActivity extends PreferenceActivity {
 			} else if (newValue instanceof Boolean)
 				label = newValue.toString();
 			
-			TrackerAnalyticsHelper.trackEvent(FeedPrefActivity.this, LOG_TAG, preference.getKey(), label, 1);
-	    	
-	    	if (preference.isEnabled() && preference.getKey().equals(FeedPrefActivity.PREF_USAGE_DATA_KEY)) {
-	    		boolean sendUsageData = ((Boolean) newValue).booleanValue();
-	    		if (sendUsageData) {
-	    			TrackerAnalyticsHelper.startTracker(FeedPrefActivity.this);
-	    		} else
-	    			TrackerAnalyticsHelper.stopTracker(FeedPrefActivity.this);
-	    	}
-	    	
 	    	SharedPreferencesHelper.backupManagerCompatWrapperDataChanged(FeedPrefActivity.this);
 	    	
 	        return true;
@@ -91,8 +80,6 @@ public class FeedPrefActivity extends PreferenceActivity {
         
         mDbFeedAdapter = new DbFeedAdapter(this);
         mDbFeedAdapter.open();
-        
-        TrackerAnalyticsHelper.createTracker(this);
         
         CharSequence title =  getString(R.string.app_name) + " - " + getString(R.string.pref_name);
         setTitle(title);
@@ -134,19 +121,16 @@ public class FeedPrefActivity extends PreferenceActivity {
 	@Override
     protected void onStart() {
     	super.onStart();
-    	TrackerAnalyticsHelper.startTracker(this);
     }
 	
 	@Override
     protected void onResume() {
     	super.onResume();
-    	TrackerAnalyticsHelper.trackPageView(this,"/preferenceView");
     }
 	
 	@Override
     protected void onStop() {
     	super.onStop();
-    	TrackerAnalyticsHelper.stopTracker(this);
     }
 	
 	@Override

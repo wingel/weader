@@ -36,7 +36,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.mfavez.android.feedgoal.FeedPrefActivity;
-import com.mfavez.android.feedgoal.common.TrackerAnalyticsHelper;
 
 /**
  * Provides helpful getter/setter methods to wrap shared preferences (application prefs + user prefs + manifest properties).
@@ -186,7 +185,6 @@ public final class SharedPreferencesHelper {
 	    } catch (NameNotFoundException nnfe) {
 			Log.e(LOG_TAG,"",nnfe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(ctx, Long.toString(errorId), nnfe.getMessage(), LOG_TAG);
 		}
     	return splashScreenDuration;
     }
@@ -199,7 +197,6 @@ public final class SharedPreferencesHelper {
 	    } catch (NameNotFoundException nnfe) {
 			Log.e(LOG_TAG,"",nnfe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(ctx, Long.toString(errorId), nnfe.getMessage(), LOG_TAG);
 		}
     	return dynamicMode;
     }
@@ -212,7 +209,6 @@ public final class SharedPreferencesHelper {
 	    } catch (NameNotFoundException nnfe) {
 			Log.e(LOG_TAG,"",nnfe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(ctx, Long.toString(errorId), nnfe.getMessage(), LOG_TAG);
 		}
     	return showUpdateDialog;
     }
@@ -362,7 +358,6 @@ public final class SharedPreferencesHelper {
 		} catch (NameNotFoundException nnfe) {
 			Log.e(LOG_TAG,"",nnfe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(ctx, Long.toString(errorId), nnfe.getMessage(), LOG_TAG);
 		}
 		return version_name;
     }
@@ -375,7 +370,6 @@ public final class SharedPreferencesHelper {
 		} catch (NameNotFoundException nnfe) {
 			Log.e(LOG_TAG,"",nnfe);
 			errorId = errorId + 1;
-    		TrackerAnalyticsHelper.trackError(ctx, Long.toString(errorId), nnfe.getMessage(), LOG_TAG);
 		}
 		return version_code;
     }
