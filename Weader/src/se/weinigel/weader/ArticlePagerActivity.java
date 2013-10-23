@@ -167,10 +167,13 @@ public class ArticlePagerActivity extends FragmentActivity implements
 
 		if (frag != null) {
 			MenuItem readMenuItem = menu.findItem(R.id.action_mark_read);
-			if (frag.isRead())
+			if (frag.isRead()) {
 				readMenuItem.setTitle(R.string.mark_unread);
-			else
+				readMenuItem.setIcon(R.drawable.ic_menu_mark_clear);
+			} else {
 				readMenuItem.setTitle(R.string.mark_read);
+				readMenuItem.setIcon(R.drawable.ic_menu_mark_set);
+			}
 
 			MenuItem favMenuItem = menu.findItem(R.id.action_mark_fav);
 			if (frag.isFavorite())

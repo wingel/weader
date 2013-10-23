@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:contentDescription="@string/favorites"
-                    android:src="@drawable/no_fav"
+                    android:src="@drawable/btn_star_big_off"
                     android:visibility="invisible" />
             </LinearLayout>
 

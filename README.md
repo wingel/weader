@@ -35,21 +35,14 @@ fetching and parsing of feeds and it handles the SQLite database on
 the phone.  The source to FeedGoal can be found at
 [http://code.google.com/p/feedgoal/].
 
-License
-=======
-
-Weader and FeedGoal are free software: you can redistribute and/or
-modify them under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-See the file LICENSE for more information.
-
 Known Bugs and Missing Features
 ===============================
 
 Lots.  For the moment I just wanted to get the application up on
 Google Play so that friends can test it and come with feedback.
+
+ * It seems that I sometimes Weader fails to mark an article as read.
+   I haven't quite figured out why yet.
 
 The main two missing features are:
 
@@ -61,3 +54,37 @@ The main two missing features are:
 
 There are a lot more things I'd like to do, but this is just a hobby
 project so don't count on it happening soon.
+
+License
+=======
+
+Weader and FeedGoal are free software: you can redistribute and/or
+modify them under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.  See [GPL-3.0.txt].
+
+Some parts of Weader are distributed under a less restrictive license,
+the Apache License Version 2.0.  See [APACHE-2.0.txt].
+
+The following icons are taken from the Android SDK and are licensed
+under the Apache License Version 2.0:
+
+    btn_star_big_off.png
+    btn_star_big_on.png
+    ic_menu_add.png
+    ic_menu_delete.png
+    ic_menu_info_details.png
+    ic_menu_preferences.png
+    ic_menu_refresh.png
+    ic_menu_star.png
+
+Other artwork in the source distribution is by Christer Weinigel and
+licensed under the Apache License Version 2.0.
+
+The Weader logotype is based on the Feed Icon by Matt Brett found at
+[http://www.feedicons.com/].  The W in the logo in the source
+distribution is a variant of the W in Ballantines-Medium font.
+
+The logo for the somewhat official release of Weader by Christer
+Weingiel is based on the logo for the compay Weinigel Ingenjörsbyrå AB
+and can not be used without permisson from that companay.

@@ -328,9 +328,9 @@ public class ArticlePageFragment extends Fragment implements
 		ImageView favView = (ImageView) mView.findViewById(R.id.fav);
 		if (favView != null) {
 			if (mFavorite)
-				favView.setImageResource(R.drawable.fav);
+				favView.setImageResource(R.drawable.btn_star_big_on);
 			else
-				favView.setImageResource(R.drawable.no_fav);
+				favView.setImageResource(R.drawable.btn_star_big_off);
 			favView.setVisibility(View.VISIBLE);
 		}
 	}

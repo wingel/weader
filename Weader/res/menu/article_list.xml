@@ -2,15 +2,18 @@
 
     <item
         android:id="@+id/action_mark_all_read"
+        android:icon="@drawable/ic_menu_mark_all_set"
         android:orderInCategory="50"
         android:title="@string/mark_all_read"/>
     <item
         android:id="@+id/action_mark_all_unread"
+        android:icon="@drawable/ic_menu_mark_all_clear"
         android:orderInCategory="60"
         android:title="@string/mark_all_unread"/>
     <item
         android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_menu_refresh"
         android:orderInCategory="20"
         android:title="@string/refresh"/>
-    
+
 </menu>

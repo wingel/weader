@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:contentDescription="@string/favorites"
-            android:src="@drawable/fav" />
+            android:src="@drawable/btn_star_big_off" />
     </LinearLayout>
 
     <TextView

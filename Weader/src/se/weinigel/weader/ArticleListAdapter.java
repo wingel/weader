@@ -76,9 +76,9 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 		ImageView favView = (ImageView) view.findViewById(R.id.fav);
 		if (favView != null) {
 			if (fav != 0)
-				favView.setImageResource(R.drawable.fav);
+				favView.setImageResource(R.drawable.btn_star_big_on);
 			else
-				favView.setImageResource(R.drawable.no_fav);
+				favView.setImageResource(R.drawable.btn_star_big_off);
 		}
 	}
 

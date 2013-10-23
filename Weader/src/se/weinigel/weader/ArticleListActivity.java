@@ -147,7 +147,7 @@ public class ArticleListActivity extends FragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		Log.d(LOG_TAG, Helper.getMethodName());
-		getMenuInflater().inflate(R.menu.article_list_option, menu);
+		getMenuInflater().inflate(R.menu.article_list, menu);
 		return true;
 	}
 
