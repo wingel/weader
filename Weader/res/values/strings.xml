@@ -33,5 +33,8 @@
     <string name="add_feed_failed">Failed to fetch feed</string>
     <string name="add_feed_ok">Feed added</string>
     <string name="add_feed_unknown">Unknown response when adding feed</string>
+    <string name="pref_path_item_filter_summary">Weader tries to recognize links that might be feeds.  This can cause problems with some pages so this feature can be turned off.</string>
+    <string name="pref_path_item_filter_title">Recognize links that might be feeds.</string>
+    <string name="title_activity_settings">Weader - Settings</string>
 
 </resources>

@@ -154,9 +154,17 @@ public class MainActivity extends FragmentActivity {
 		case R.id.action_add_feed:
 			onAddFeed();
 			return false;
+		case R.id.action_settings:
+			onSettings();
+			return false;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void onSettings() {
+		Intent intent = new Intent(this, SettingsActivity.class);
+		startActivity(intent);
 	}
 
 	@Override

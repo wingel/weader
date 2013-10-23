@@ -196,6 +196,11 @@
             android:label="@string/title_activity_about"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+        <activity
+            android:name="se.weinigel.weader.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@android:style/Theme.Black" >
+        </activity>
     </application>
 
 </manifest>
