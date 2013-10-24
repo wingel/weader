@@ -3,6 +3,7 @@
 
     <string name="about_title">A simple Atom/RSS Feed Reader</string>
     <string name="about_copying">Weader is based on another feed reader for Android called FeedGoal.\n\nWeader and FeedGoal are free software: you can redistribute and/or modify them under the terms of the GNU General Public License as published by  the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
+    <string name="about_version">Version %1$s</string>
     <string name="about_website">https://github.com/wingel/weader</string>
     <string name="action_add_feed">Add Feed</string>
     <string name="action_about">About</string>
