@@ -6,7 +6,7 @@
     android:versionName="1.1" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="7"
         android:targetSdkVersion="10"
         tools:ignore="OldTargetApi" />
 

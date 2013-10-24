@@ -1,16 +1,17 @@
 package se.weinigel.weader;
 
 import java.util.HashSet;
-
 import se.weinigel.weader.R;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.UpdateFeedService;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
@@ -203,7 +204,7 @@ public class ArticleListActivity extends FragmentActivity {
 	}
 
 	public class ArticleSelectedReceiver extends BroadcastReceiver {
-		@SuppressWarnings("unused")
+		@SuppressLint("NewApi")
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			long articleId = intent.getLongExtra(
@@ -214,9 +215,7 @@ public class ArticleListActivity extends FragmentActivity {
 			for (int i = 0; i < mListAdapter.getCount(); i++) {
 				if (articleId == mListAdapter.getItemId(i)) {
 					ListView listView = (ListView) findViewById(R.id.list);
-					if (false)
-						listView.setSelection(i);
-					else
+					if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1)
 						listView.smoothScrollToPosition(i);
 					break;
 				}
