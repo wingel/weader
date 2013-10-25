@@ -193,7 +193,7 @@ public class ArticlePageFragment extends Fragment implements
 
 		String title;
 		long date;
-		mRead = false;
+		mRead = true;
 		mFavorite = false;
 
 		String content;
@@ -204,7 +204,6 @@ public class ArticlePageFragment extends Fragment implements
 
 			title = cursor.getString(0);
 			date = cursor.getLong(1);
-			mRead = "1".equals(cursor.getString(2));
 			mFavorite = "1".equals(cursor.getString(3));
 			mLink = cursor.getString(4);
 			content = cursor.getString(5);

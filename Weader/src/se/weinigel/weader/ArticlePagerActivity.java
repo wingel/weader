@@ -31,6 +31,8 @@ public class ArticlePagerActivity extends FragmentActivity implements
 
 	private ArticlePagerAdapter mPagerAdapter;
 
+	private ContentHelper mArticleHelper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +40,8 @@ public class ArticlePagerActivity extends FragmentActivity implements
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
 		setContentView(R.layout.activity_article_pager);
+
+		mArticleHelper = new ContentHelper(this);
 
 		ViewPager pagerView = (ViewPager) findViewById(R.id.pager);
 
@@ -124,24 +128,33 @@ public class ArticlePagerActivity extends FragmentActivity implements
 		}
 	}
 
-	public void updatePage(int idx) {
+	public void updatePage(int position) {
 		ViewPager pagerView = (ViewPager) findViewById(R.id.pager);
-		pagerView.setCurrentItem(idx);
+		pagerView.setCurrentItem(position);
 		PageChangeListener listener = new PageChangeListener();
 		pagerView.setOnPageChangeListener(listener);
-		listener.onPageSelected(idx);
+		setRead(position);
+	}
+
+	private void setRead(int position) {
+		Cursor cursor = mPagerAdapter.getCursor();
+		cursor.moveToPosition(position);
+		final long id = cursor.getLong(cursor
+				.getColumnIndex(WeadContract.Article.COLUMN_ID));
+		new AsyncTask<Void, Void, Void>() {
+			@Override
+			protected Void doInBackground(Void... params) {
+				mArticleHelper.setArticleRead(id, true);
+				return null;
+			}
+		}.execute((Void) null);
 	}
 
 	private final class PageChangeListener implements OnPageChangeListener {
 		@Override
 		public void onPageSelected(int position) {
-			ArticlePageFragment frag = mPagerAdapter.getItemAt(position);
-			Log.d(LOG_TAG, "pageSelected " + position + " " + frag);
-			if (frag != null) {
-				frag.setRead(true);
-				setProgressBarIndeterminateVisibility(!frag.isFinished());
-				frag.setArticlePageListener(ArticlePagerActivity.this);
-			}
+			Log.d(LOG_TAG, "pageSelected " + position);
+			setRead(position);
 		}
 
 		@Override

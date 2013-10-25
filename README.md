@@ -41,8 +41,8 @@ Known Bugs and Missing Features
 Lots.  For the moment I just wanted to get the application up on
 Google Play so that friends can test it and come with feedback.
 
- * It seems that I sometimes Weader fails to mark an article as read.
-   I haven't quite figured out why yet.
+ * It seems that sometimes Weader fails to mark an article as read.
+   I believe this is fixed now.
 
 Missing features I'd like to implement some day:
 
