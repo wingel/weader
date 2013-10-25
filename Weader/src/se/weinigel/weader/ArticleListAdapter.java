@@ -15,6 +15,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,6 +33,23 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 	private int mItemSelectedText;
 	private CharSequence mDatePattern;
 
+	public interface ArticleListListener {
+		public void onClickFavorite(long l);
+	};
+
+	private ArticleListListener listener;
+
+	public void setListener(ArticleListListener listener) {
+		this.listener = listener;
+	}
+
+	private OnClickListener favClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			listener.onClickFavorite((Long) v.getTag());
+		}
+	};
+
 	ArticleListAdapter(Context context) {
 		super(context, R.layout.list_item_article, null, new String[] {},
 				new int[] {}, 0);
@@ -46,6 +64,7 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
+		long id = cursor.getLong(0);
 		String title = cursor.getString(1);
 		Date date = new Date(cursor.getLong(2));
 		int read = cursor.getInt(3);
@@ -79,6 +98,9 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 				favView.setImageResource(R.drawable.btn_star_big_on);
 			else
 				favView.setImageResource(R.drawable.btn_star_big_off);
+
+			favView.setOnClickListener(favClickListener);
+			favView.setTag(id);
 		}
 	}
 
