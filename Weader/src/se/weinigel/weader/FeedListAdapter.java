@@ -23,12 +23,22 @@ final class FeedListAdapter extends SimpleCursorAdapter implements
 
 	protected static final String[] PROJECTION = new String[] {
 			WeadContract.Feed.COLUMN_ID, WeadContract.Feed.COLUMN_TITLE,
-			WeadContract.Feed.COLUMN_UNREAD, };
+			WeadContract.Feed.COLUMN_UNREAD, WeadContract.Feed.COLUMN_REFRESH };
 
 	private int mItemNotselectedText;
 	private int mItemSelectedText;
 
 	private HashSet<Long> feedsBusy = new HashSet<Long>();
+
+	public interface FeedListAdapterListener {
+		public void onLoadFinished();
+	}
+
+	private FeedListAdapterListener listener;
+
+	public void setListener(FeedListAdapterListener listener) {
+		this.listener = listener;
+	}
 
 	FeedListAdapter(Context context) {
 		super(context, R.layout.list_item_feed, null, new String[] {},
@@ -90,6 +100,8 @@ final class FeedListAdapter extends SimpleCursorAdapter implements
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 		Log.d(LOG_TAG, Helper.getMethodName());
 		swapCursor(data);
+		if (listener != null)
+			listener.onLoadFinished();
 	}
 
 	@Override

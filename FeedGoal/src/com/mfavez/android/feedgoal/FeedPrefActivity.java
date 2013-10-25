@@ -49,7 +49,7 @@ public class FeedPrefActivity extends PreferenceActivity {
 	
 	public static final String DEFAULT_START_CHANNEL = "1";
 	public static final String DEFAULT_ITEM_VIEW = "0"; // 0 => Offline, 1 => Online
-	public static final String DEFAULT_MAX_ITEMS_PER_FEED = "20";
+	public static final String DEFAULT_MAX_ITEMS_PER_FEED = "100";
 	public static final String DEFAULT_MAX_HOURS_PER_FEED = "-1"; // Never
 	public static final String DEFAULT_UPDATE_PERIOD = "60"; // 60 minutes = 1 hour
 	public static final boolean DEFAULT_USAGE_DATA = false;

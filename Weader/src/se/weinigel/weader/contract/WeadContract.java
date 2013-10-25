@@ -28,16 +28,16 @@ public class WeadContract {
 
 		public static final String COLUMN_ID = BaseColumns._ID;
 
-		public static final String COLUMN_FEED_ID = "feed_id";
-
 		public static final String COLUMN_TITLE = "title";
 
 		public static final String COLUMN_URL = "url";
 
 		public static final String COLUMN_UNREAD = "unread";
 
+		public static final String COLUMN_REFRESH = "refresh";
+
 		public static final String[] PROJECTION_ALL = { COLUMN_ID,
-				COLUMN_FEED_ID, COLUMN_TITLE, COLUMN_UNREAD };
+				COLUMN_TITLE, COLUMN_UNREAD, COLUMN_REFRESH };
 
 		public static final String SORT_ORDER_DEFAULT = COLUMN_TITLE
 				+ " COLLATE LOCALIZED ASC";

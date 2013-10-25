@@ -1,9 +1,11 @@
 package se.weinigel.weader;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import se.weinigel.weader.FeedListAdapter.FeedListAdapterListener;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.AddFeedService;
 import se.weinigel.weader.service.UpdateFeedService;
@@ -16,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,7 +41,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements
+		FeedListAdapterListener {
 	private final String LOG_TAG = getClass().getSimpleName();
 
 	private FeedListAdapter mListAdapter;
@@ -54,6 +58,8 @@ public class MainActivity extends FragmentActivity {
 	private UpdateFeedServiceReceiver updateServiceReceiver;
 
 	private AddFeedServiceReceiver addServiceReceiver;
+
+	private HashSet<Long> refreshing = new HashSet<Long>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +81,7 @@ public class MainActivity extends FragmentActivity {
 		listView.setAdapter(mListAdapter);
 		getSupportLoaderManager().initLoader(0, getIntent().getExtras(),
 				mListAdapter);
+		mListAdapter.setListener(this);
 
 		registerForContextMenu(listView);
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -120,6 +127,11 @@ public class MainActivity extends FragmentActivity {
 		unregisterLocalReceiver(addServiceReceiver);
 		unregisterLocalReceiver(updateServiceReceiver);
 		super.onDestroy();
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 	}
 
 	protected void updateUi() {
@@ -282,6 +294,9 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void startRefresh(long feedId) {
+		if (refreshing.contains(feedId))
+			return;
+		refreshing.add(feedId);
 		Log.d(LOG_TAG, "starting UpdateFeedService " + feedId);
 		Intent intent = new Intent(this, UpdateFeedService.class);
 		intent.putExtra(WeadContract.Feed.COLUMN_ID, feedId);
@@ -289,8 +304,35 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void startRefreshAll() {
-		for (int i = 0; i < mListAdapter.getCount(); i++)
-			startRefresh(mListAdapter.getItemId(i));
+		Cursor cursor = mListAdapter.getCursor();
+		cursor.moveToFirst();
+		int idCol = cursor.getColumnIndex(WeadContract.Feed.COLUMN_ID);
+		while (!cursor.isAfterLast()) {
+			long id = cursor.getLong(idCol);
+			startRefresh(id);
+			cursor.moveToNext();
+		}
+	}
+
+	private void startAutoRefresh() {
+		Cursor cursor = mListAdapter.getCursor();
+		cursor.moveToFirst();
+		int idCol = cursor.getColumnIndex(WeadContract.Feed.COLUMN_ID);
+		int titleCol = cursor.getColumnIndex(WeadContract.Feed.COLUMN_TITLE);
+		int refreshCol = cursor
+				.getColumnIndex(WeadContract.Feed.COLUMN_REFRESH);
+		long now = new Date().getTime();
+		while (!cursor.isAfterLast()) {
+			long refresh = cursor.getLong(refreshCol);
+			Log.d(LOG_TAG, "refresh " + cursor.getString(titleCol) + " "
+					+ refresh + " " + (now - refresh));
+			// TODO should have a preference for refresh time
+			if (now - refresh > 60 * 60 * 1000) {
+				long id = cursor.getLong(idCol);
+				startRefresh(id);
+			}
+			cursor.moveToNext();
+		}
 	}
 
 	void updateList() {
@@ -315,6 +357,7 @@ public class MainActivity extends FragmentActivity {
 			if (UpdateFeedService.RESPONSE_START.equals(response))
 				mListAdapter.setFeedBusy(feedId, true);
 			else {
+				refreshing.remove(feedId);
 				mListAdapter.setFeedBusy(feedId, false);
 				updateList();
 			}
@@ -448,5 +491,10 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		context.startActivity(newIntent);
+	}
+
+	@Override
+	public void onLoadFinished() {
+		startAutoRefresh();
 	}
 }

@@ -44,13 +44,18 @@ Google Play so that friends can test it and come with feedback.
  * It seems that I sometimes Weader fails to mark an article as read.
    I haven't quite figured out why yet.
 
-The main two missing features are:
+Missing features I'd like to implement some day:
 
-* Automatic refresh - right now one has do a refresh of the feeds
-  manually.
+ * OPML import
 
-* Expiry - articles do not expire, so sooner or later weader will fill
-  up your data partition.
+ * Offline support - download images so that feeds can be read
+   offline.  This is probably quite tricky.
+
+ * Add a synthetic feed with all favorites
+
+ * Show categories at the end of posts
+
+ * Background download of feeds when the application is not active.
 
 There are a lot more things I'd like to do, but this is just a hobby
 project so don't count on it happening soon.

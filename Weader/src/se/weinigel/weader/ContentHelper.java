@@ -34,13 +34,13 @@ public class ContentHelper {
 		values.put(WeadContract.Article.COLUMN_READ, read ? 1 : 0);
 
 		mContext.getContentResolver().update(WeadContract.Article.CONTENT_URI,
-				values, WeadContract.Feed.COLUMN_FEED_ID + "=?",
+				values, WeadContract.Article.COLUMN_FEED_ID + "=?",
 				new String[] { Long.toString(feedId) });
 	}
 
 	public void deleteFeed(long feedId) {
 		mContext.getContentResolver().delete(WeadContract.Article.CONTENT_URI,
-				WeadContract.Feed.COLUMN_FEED_ID + "=?",
+				WeadContract.Article.COLUMN_FEED_ID + "=?",
 				new String[] { Long.toString(feedId) });
 		mContext.getContentResolver().delete(WeadContract.Feed.CONTENT_URI,
 				WeadContract.Feed.COLUMN_ID + "=?",
