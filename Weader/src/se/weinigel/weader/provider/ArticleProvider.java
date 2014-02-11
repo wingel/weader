@@ -1,9 +1,6 @@
 package se.weinigel.weader.provider;
 
 import se.weinigel.weader.contract.WeadContract;
-
-import com.mfavez.android.feedgoal.storage.DbSchema;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -43,6 +40,13 @@ public class ArticleProvider extends SimpleProvider {
 		}
 
 		return cursor;
+	}
+
+	@Override
+	public Uri insert(Uri uri, ContentValues values) {
+		long id = getDb().insert(DbSchema.ItemSchema.TABLE_NAME, null, values);
+		return Uri.parse(WeadContract.Article.CONTENT_URI + "/"
+				+ Long.toString(id));
 	}
 
 	@Override

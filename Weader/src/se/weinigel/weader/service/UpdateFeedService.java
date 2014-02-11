@@ -1,11 +1,13 @@
 package se.weinigel.weader.service;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import android.app.IntentService;
 import android.content.Intent;
@@ -14,7 +16,6 @@ import android.util.Log;
 
 import com.mfavez.android.feedgoal.FeedHandler;
 import com.mfavez.android.feedgoal.common.Feed;
-import com.mfavez.android.feedgoal.storage.DbFeedAdapter;
 
 public class UpdateFeedService extends IntentService {
 	private static final String LOG_TAG = UpdateFeedService.class
@@ -28,16 +29,16 @@ public class UpdateFeedService extends IntentService {
 	public static final String RESPONSE_START = "start";
 	public static final String RESPONSE_STOP = "stop";
 
-	private DbFeedAdapter mDbFeedAdapter;
+	private ContentHelper mContentHelper;
 
 	public UpdateFeedService() {
 		super(LOG_TAG);
+		mContentHelper = new ContentHelper(this);
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mDbFeedAdapter = new DbFeedAdapter(this);
 	}
 
 	@Override
@@ -60,24 +61,16 @@ public class UpdateFeedService extends IntentService {
 	}
 
 	private void updateFeed(long feedId) {
-		mDbFeedAdapter.open();
-		Feed feed = mDbFeedAdapter.getFeed(feedId);
-		if (feed != null)
-			updateFeed(feed);
-		mDbFeedAdapter.close();
-	}
+		String url = mContentHelper.getFeedUrl(feedId);
 
-	private void updateFeed(Feed feed) {
-		Log.d(LOG_TAG, "loading " + feed.getTitle());
-		long feedId = feed.getId();
+		Log.d(LOG_TAG, "loading feed " + url);
 
 		respond(feedId, RESPONSE_START);
 		try {
 			FeedHandler feedHandler = new FeedHandler(this);
-			Feed handledFeed = feedHandler.handleFeed(feed.getURL());
-			handledFeed.setId(feedId);
-			mDbFeedAdapter.updateFeed(handledFeed);
-			mDbFeedAdapter.cleanDbItems(feedId);
+			Feed handledFeed = feedHandler.handleFeed(new URL(url));
+			mContentHelper.updateFeed(feedId, handledFeed);
+			mContentHelper.gcFeed(feedId);
 		} catch (IOException ioe) {
 			Log.e(LOG_TAG, "", ioe);
 		} catch (SAXException se) {

@@ -21,12 +21,7 @@
 package com.mfavez.android.feedgoal.common;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import com.mfavez.android.feedgoal.storage.DbSchema;
 
 /**
  * A class for creating and managing instances of items.
@@ -46,14 +41,12 @@ public class Item {
 	private Date mPubdate;
 	private boolean mFavorite = false;
 	private boolean mRead = false;
-	private List<Enclosure> mEnclosures;
 	
 	public Item() {
-		mEnclosures = new ArrayList<Enclosure>();
 		mPubdate = new Date();
 	}
 	
-	public Item(long id, URL link, String guid, String title, String description, String content, URL image, Date pubdate, boolean favorite, boolean read, List<Enclosure> enclosures) {
+	public Item(long id, URL link, String guid, String title, String description, String content, URL image, Date pubdate, boolean favorite, boolean read) {
 		super();
 		this.mId = id;
 		this.mLink = link;
@@ -65,7 +58,6 @@ public class Item {
 		this.mPubdate = pubdate;
 		this.mFavorite = favorite;
 		this.mRead = read;
-		this.mEnclosures = enclosures;
 	}
 	
 	public void setId(long id) {
@@ -150,7 +142,7 @@ public class Item {
 	*/
 	
 	public void setFavorite(int state) {
-		if (state == DbSchema.OFF)
+		if (state == 0)
 			this.mFavorite = false;
 		else
 			this.mFavorite = true;
@@ -178,7 +170,7 @@ public class Item {
 	*/
 	
 	public void setRead(int state) {
-		if (state == DbSchema.OFF)
+		if (state == 0)
 			this.mRead = false;
 		else
 			this.mRead = true;
@@ -188,26 +180,8 @@ public class Item {
 		return this.mRead;
 	}
 	
-	public void addEnclosure(Enclosure enclosure) {
-		this.mEnclosures.add(enclosure);
-	}
-	
-	public void setEnclosures(List<Enclosure> enclosures){
-		this.mEnclosures = enclosures;
-	}
-	
-	public List<Enclosure> getEnclosures() {
-		return this.mEnclosures;
-	}
-	
 	public String toString() {
 		String s =  "{ID=" + this.mId + " link=" + this.mLink.toString() + " GUID=" + this.mGuid + " title=" + this.mTitle + " description=" + this.mDescription + " content=" + this.mContent + " image=" + this.mImage.toString() + " pubdate=" + this.mPubdate.toString() + " favorite=" + this.mFavorite + " read=" + this.mRead + "}";
-		s = s + " items={";
-		Iterator<Enclosure> iterator = this.mEnclosures.iterator();
-		while (iterator.hasNext()) {
-			s = s + iterator.next().toString();
-		}
-		s = s + "}}";
 		return s;
 	}
 }

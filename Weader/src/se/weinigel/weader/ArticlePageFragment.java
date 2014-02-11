@@ -3,6 +3,7 @@ package se.weinigel.weader;
 import java.lang.ref.WeakReference;
 
 import se.weinigel.weader.R;
+import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import android.app.Activity;
 import android.content.Intent;
@@ -43,7 +44,7 @@ public class ArticlePageFragment extends Fragment implements
 
 	private boolean mFinished;
 
-	private ContentHelper mArticleHelper;
+	private ContentHelper mContentHelper;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,7 +52,7 @@ public class ArticlePageFragment extends Fragment implements
 		Log.d(LOG_TAG, Helper.getMethodName());
 		Log.d(LOG_TAG, "arguments " + getArguments());
 
-		mArticleHelper = new ContentHelper(getActivity());
+		mContentHelper = new ContentHelper(getActivity());
 
 		mArticleId = Helper.bundleGetStringLong(getArguments(),
 				WeadContract.Article.COLUMN_ID);
@@ -304,7 +305,7 @@ public class ArticlePageFragment extends Fragment implements
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				mArticleHelper.setArticleRead(mArticleId, mRead);
+				mContentHelper.updateArticleRead(mArticleId, mRead);
 				return null;
 			}
 		}.execute((Void) null);
@@ -317,7 +318,7 @@ public class ArticlePageFragment extends Fragment implements
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				mArticleHelper.setArticleFavorite(mArticleId, mFavorite);
+				mContentHelper.updateArticleFavorite(mArticleId, mFavorite);
 				return null;
 			}
 		}.execute((Void) null);

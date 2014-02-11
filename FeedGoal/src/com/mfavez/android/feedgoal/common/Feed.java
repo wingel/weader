@@ -26,8 +26,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import com.mfavez.android.feedgoal.storage.DbSchema;
-
 /**
  * A class for creating and managing instances of feeds.
  * @author Mathieu Favez
@@ -40,7 +38,6 @@ public class Feed {
 	public static final String TYPE_RSS = "rss";
 	public static final String TYPE_ATOM = "atom";
 	
-	private long mId = -1;
 	private URL mURL;
 	private URL mHomePage;
 	private String mTitle;
@@ -53,9 +50,8 @@ public class Feed {
 		mItems = new ArrayList<Item>();
 	}
 	
-	public Feed(long id, URL url, URL homePage, String title, String type, Date refresh, boolean enabled, List<Item> items) {
+	public Feed(URL url, URL homePage, String title, String type, Date refresh, boolean enabled, List<Item> items) {
 		super();
-		this.mId = id;
 		this.mURL = url;
 		this.mHomePage = homePage;
 		this.mTitle = title;
@@ -63,14 +59,6 @@ public class Feed {
 		this.mRefresh = refresh;
 		this.mEnabled = enabled;
 		this.mItems = items;
-	}
-	
-	public void setId(long id) {
-		this.mId = id;
-	}
-	
-	public long getId() {
-		return mId;
 	}
 	
 	public void setURL(URL url) {
@@ -122,7 +110,7 @@ public class Feed {
 	}
 	
 	public void setEnabled(int state) {
-		if (state == DbSchema.OFF)
+		if (state == 0)
 			this.mEnabled = false;
 		else
 			this.mEnabled = true;
@@ -145,7 +133,7 @@ public class Feed {
 	}
 	
 	public String toString() {
-		String s = "{ID=" + this.mId + " URL=" + this.mURL.toString() + " homepage=" + this.mHomePage.toString() + " title=" + this.mTitle + " type=" + this.mType + " update=" + this.mRefresh.toString() + " enabled=" + this.mEnabled;
+		String s = "{URL=" + this.mURL.toString() + " homepage=" + this.mHomePage.toString() + " title=" + this.mTitle + " type=" + this.mType + " update=" + this.mRefresh.toString() + " enabled=" + this.mEnabled;
 		s = s + " items={";
 		Iterator<Item> iterator = this.mItems.iterator();
 		while (iterator.hasNext()) {

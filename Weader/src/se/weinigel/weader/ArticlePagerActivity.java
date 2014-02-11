@@ -2,6 +2,7 @@ package se.weinigel.weader;
 
 import se.weinigel.weader.R;
 import se.weinigel.weader.ArticlePageFragment.ArticlePageListener;
+import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.AddFeedService;
 import android.content.Intent;
@@ -31,7 +32,7 @@ public class ArticlePagerActivity extends FragmentActivity implements
 
 	private ArticlePagerAdapter mPagerAdapter;
 
-	private ContentHelper mArticleHelper;
+	private ContentHelper mContentHelper;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class ArticlePagerActivity extends FragmentActivity implements
 
 		setContentView(R.layout.activity_article_pager);
 
-		mArticleHelper = new ContentHelper(this);
+		mContentHelper = new ContentHelper(this);
 
 		ViewPager pagerView = (ViewPager) findViewById(R.id.pager);
 
@@ -144,7 +145,7 @@ public class ArticlePagerActivity extends FragmentActivity implements
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				mArticleHelper.setArticleRead(id, true);
+				mContentHelper.updateArticleRead(id, true);
 				return null;
 			}
 		}.execute((Void) null);

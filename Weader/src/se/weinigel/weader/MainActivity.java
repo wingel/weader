@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import se.weinigel.weader.FeedListAdapter.FeedListAdapterListener;
+import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.AddFeedService;
 import se.weinigel.weader.service.UpdateFeedService;

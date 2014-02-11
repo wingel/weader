@@ -3,8 +3,8 @@ package se.weinigel.weader.service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.List;
 
+import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import android.app.IntentService;
 import android.content.Intent;
@@ -14,7 +14,6 @@ import android.util.Log;
 
 import com.mfavez.android.feedgoal.FeedHandler;
 import com.mfavez.android.feedgoal.common.Feed;
-import com.mfavez.android.feedgoal.storage.DbFeedAdapter;
 
 public class AddFeedService extends IntentService {
 	private static final String LOG_TAG = AddFeedService.class.getSimpleName();
@@ -31,16 +30,17 @@ public class AddFeedService extends IntentService {
 	public static final String RESPONSE_EXISTS = "exists";
 	public static final String RESPONSE_ADDED = "added";
 
-	private DbFeedAdapter mDbFeedAdapter;
+	private ContentHelper mContentHelper;
 
 	public AddFeedService() {
 		super(LOG_TAG);
+
+		mContentHelper = new ContentHelper(this);
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mDbFeedAdapter = new DbFeedAdapter(this);
 	}
 
 	@Override
@@ -63,20 +63,14 @@ public class AddFeedService extends IntentService {
 	}
 
 	private void addFeed(Uri uri, boolean fuzzy) {
-		mDbFeedAdapter.open();
-
 		respond(uri, RESPONSE_START);
 
 		try {
 			HashSet<String> existing = new HashSet<String>();
 
-			List<Feed> feeds = mDbFeedAdapter.getFeeds();
-			for (Feed feed : feeds)
-				existing.add(feed.getURL().toString());
-
 			String url = uri.toString();
 
-			if (existing.contains(url)) {
+			if (mContentHelper.hasFeed(url)) {
 				respond(uri, RESPONSE_EXISTS);
 				return;
 			}
@@ -120,13 +114,12 @@ public class AddFeedService extends IntentService {
 				return;
 			}
 
-			mDbFeedAdapter.addFeed(feed);
+			mContentHelper.insertFeed(feed);
 			respond(uri, RESPONSE_ADDED);
 		} catch (Exception e) {
 			Log.d(LOG_TAG, "exception", e);
 			respond(uri, RESPONSE_ERROR);
 		} finally {
-			mDbFeedAdapter.close();
 		}
 	}
 

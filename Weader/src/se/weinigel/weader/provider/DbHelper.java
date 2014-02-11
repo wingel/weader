@@ -5,8 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.mfavez.android.feedgoal.storage.DbSchema;
-
 public class DbHelper extends SQLiteOpenHelper {
 	public DbHelper(Context context) {
 		super(context, DbSchema.DATABASE_NAME, null, DbSchema.DATABASE_VERSION);
@@ -14,6 +12,8 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+        db.execSQL(DbSchema.FeedSchema.CREATE_TABLE);
+        db.execSQL(DbSchema.ItemSchema.CREATE_TABLE);
 	}
 
 	@Override

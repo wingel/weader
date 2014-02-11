@@ -66,6 +66,8 @@ public class WeadContract {
 
 		public static final String COLUMN_TITLE = "title";
 
+		public static final String COLUMN_GUID = "guid";
+
 		public static final String COLUMN_CONTENT = "content";
 
 		public static final String COLUMN_PUB_DATE = "pubdate";
@@ -80,5 +82,6 @@ public class WeadContract {
 
 		public static final String SORT_ORDER_DEFAULT = COLUMN_PUB_DATE
 				+ " DESC";
+
 	}
 }

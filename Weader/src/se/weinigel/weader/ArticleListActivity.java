@@ -3,6 +3,7 @@ package se.weinigel.weader;
 import java.util.HashSet;
 
 import se.weinigel.weader.ArticleListAdapter.ArticleListListener;
+import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.UpdateFeedService;
 import android.annotation.SuppressLint;
@@ -36,7 +37,7 @@ public class ArticleListActivity extends FragmentActivity implements
 
 	private ArticleListAdapter mListAdapter;
 
-	private ContentHelper mArticleHelper;
+	private ContentHelper mContentHelper;
 
 	private long mFeedId;
 
@@ -52,7 +53,7 @@ public class ArticleListActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		mArticleHelper = new ContentHelper(this);
+		mContentHelper = new ContentHelper(this);
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
@@ -252,7 +253,7 @@ public class ArticleListActivity extends FragmentActivity implements
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				mArticleHelper.setArticleRead(itemId, b);
+				mContentHelper.updateArticleRead(itemId, b);
 				return null;
 			}
 
@@ -277,7 +278,7 @@ public class ArticleListActivity extends FragmentActivity implements
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				mArticleHelper.setArticleFavorite(itemId, b);
+				mContentHelper.updateArticleFavorite(itemId, b);
 				return null;
 			}
 
@@ -300,7 +301,7 @@ public class ArticleListActivity extends FragmentActivity implements
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
-				mArticleHelper.setFeedRead(mFeedId, b);
+				mContentHelper.updateAllArticlesRead(mFeedId, b);
 				return null;
 			}
 

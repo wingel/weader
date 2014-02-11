@@ -49,10 +49,8 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
 
-import com.mfavez.android.feedgoal.common.Enclosure;
 import com.mfavez.android.feedgoal.common.Feed;
 import com.mfavez.android.feedgoal.common.Item;
-import com.mfavez.android.feedgoal.storage.SharedPreferencesHelper;
 
 /**
  * Provides basic SAX parsing and feed support for RSS/ATOM format.
@@ -65,7 +63,6 @@ public class FeedHandler extends DefaultHandler {
 	
 	private Feed mFeed;
 	private Item mItem;
-	private Enclosure mEnclosure; 
 	
 	//RSS Date Formats:
 	//			RFC822 Time Zone: EEE, dd MMM yyyy HH:mm:ss Z
@@ -101,7 +98,7 @@ public class FeedHandler extends DefaultHandler {
 	private StringBuffer mSb;
 	
 	public FeedHandler(Context ctx) {
-		maxItems = SharedPreferencesHelper.getPrefMaxItems(ctx);
+		maxItems = 100;
 		
 		for (int i = 0; i < DATE_FORMATS.length; i++) {
 			//mSimpleDateFormats[i] = new SimpleDateFormat(DATE_FORMATS[i]);
@@ -145,11 +142,6 @@ public class FeedHandler extends DefaultHandler {
 				// Get attributes from link element for Atom format
 				if (attributes != null) {
 					// Enclosure for Atom format
-					if (attributes.getValue("rel") != null && attributes.getValue("rel").equalsIgnoreCase("enclosure")) {
-						mEnclosure = new Enclosure();
-						mMimeAttribute = attributes.getValue("type");
-						isEnclosure = true;
-					}
 					mHrefAttribute = attributes.getValue("href");
 				}
 				isLink = true;
@@ -166,10 +158,6 @@ public class FeedHandler extends DefaultHandler {
 			else if (value.equalsIgnoreCase("enclosure")) {
 				// Enclosure for RSS format
 				if (attributes != null) {
-					mEnclosure = new Enclosure();
-					mMimeAttribute = attributes.getValue("type");
-					mHrefAttribute = attributes.getValue("url");
-					isEnclosure = true;
 				}
 			}
 		}
@@ -210,9 +198,6 @@ public class FeedHandler extends DefaultHandler {
 					try {
 						if (isEnclosure) {
 							// Enclosure for Atom format
-							mEnclosure.setMime(mMimeAttribute);
-							mEnclosure.setURL(new URL(mHrefAttribute));
-							mItem.addEnclosure(mEnclosure);
 							mMimeAttribute = null;
 							isEnclosure = false;
 						} else if (mHrefAttribute != null)
@@ -269,16 +254,9 @@ public class FeedHandler extends DefaultHandler {
 				isSource = false;
 			else if (value.equalsIgnoreCase("enclosure")) {
 				if (isItem) {
-					try {
-						// Enclosure for RSS format
-						mEnclosure.setMime(mMimeAttribute);
-						mEnclosure.setURL(new URL(mHrefAttribute));
-						mItem.addEnclosure(mEnclosure);
-						mMimeAttribute = null;
-						mHrefAttribute = null;
-					} catch(MalformedURLException mue) {
-						throw new SAXException(mue);
-					}
+					// Enclosure for RSS format
+					mMimeAttribute = null;
+					mHrefAttribute = null;
 				}
 				isEnclosure = false;
 			}

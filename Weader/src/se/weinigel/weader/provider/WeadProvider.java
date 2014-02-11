@@ -11,8 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
-import com.mfavez.android.feedgoal.storage.DbFeedAdapter;
-
 public class WeadProvider extends ContentProvider {
 	static final String LOG_TAG = WeadProvider.class.getSimpleName();
 
@@ -26,12 +24,6 @@ public class WeadProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		Log.d(LOG_TAG, Helper.getMethodName());
-
-		// This is done to let FeedGoal create the database structure on the
-		// first open
-		DbFeedAdapter dbFeedAdapter = new DbFeedAdapter(getContext());
-		dbFeedAdapter.open();
-		dbFeedAdapter.close();
 
 		mDbHelper = new DbHelper(getContext());
 		mDbHelper.hack();
