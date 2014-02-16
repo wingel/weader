@@ -69,7 +69,9 @@ public class UpdateFeedService extends IntentService {
 		try {
 			FeedHandler feedHandler = new FeedHandler(this);
 			Feed handledFeed = feedHandler.handleFeed(new URL(url));
+			Log.e(LOG_TAG, "updateFeed");
 			mContentHelper.updateFeed(feedId, handledFeed);
+			Log.e(LOG_TAG, "gcFeed");
 			mContentHelper.gcFeed(feedId);
 		} catch (IOException ioe) {
 			Log.e(LOG_TAG, "", ioe);

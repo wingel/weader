@@ -18,6 +18,8 @@ import com.mfavez.android.feedgoal.common.Feed;
 import com.mfavez.android.feedgoal.common.Item;
 
 public class ContentHelper {
+	private static final long MAX_ARTICLES = 100;
+
 	private Context mContext;
 
 	public ContentHelper(Context context) {
@@ -251,6 +253,16 @@ public class ContentHelper {
 	}
 
 	public void gcFeed(long feedId) {
-		// TODO perform a garbage collect and remove old items
+		delete(WeadContract.Article.CONTENT_URI,
+
+				WeadContract.Article.COLUMN_ID + " IN (SELECT "
+						+ WeadContract.Article.COLUMN_ID + " FROM "
+						+ DbSchema.ItemSchema.TABLE_NAME + " WHERE "
+						+ WeadContract.Article.COLUMN_FEED_ID + "=?" + " AND "
+						+ WeadContract.Article.COLUMN_READ + "=1"
+						+ " ORDER BY " + WeadContract.Article.COLUMN_ID
+						+ " DESC LIMIT ?,-1)",
+				new String[] { Long.toString(feedId),
+						Long.toString(MAX_ARTICLES) });
 	}
 }

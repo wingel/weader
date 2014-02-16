@@ -82,6 +82,5 @@ public class WeadContract {
 
 		public static final String SORT_ORDER_DEFAULT = COLUMN_PUB_DATE
 				+ " DESC";
-
 	}
 }
