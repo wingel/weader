@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<opml version="1.0">
+  <head>
+    <title>Subscriptions</title>
+  </head>
+  <body>
+    <!-- this one gives a HTTP 403 if User-Agent isn't changed due to cloudflare idiocy, it also gives a HTTP 301 since it's missing a slash at the end -->
+    <outline xmlUrl="http://freethoughtblogs.com/pharyngula/feed" type="rss" text="Pharyngula" title="Pharyngula" htmlUrl="http://freethoughtblogs.com/pharyngula" />
+
+    <!-- this URL starts with <rss version="1.0"> which is rather broken, it's rather something like version 0.92 -->
+    <outline xmlUrl="http://www.marsnews.com/xml/marsnews.rdf" type="rss" text="MarsNews.com" title="MarsNews.com" htmlUrl="http://www.marsnews.com/" />
+
+	<!-- RSS 1.0/RDF feeds -->
+    <outline xmlUrl="http://feeds.nature.com/nature/rss/current?format=xml" type="rss" text="Nature - Issue - nature.com science feeds" title="Nature - Issue - nature.com science feeds" />
+    <outline xmlUrl="http://simile.mit.edu/blog/?feed=rdf" type="rss" text="The SIMILE Blog" title="The SIMILE Blog" />
+    
+	<!-- RSS 0.91/0.92/2.0 feeds -->   
+    <outline xmlUrl="http://blog.weinigel.se/feeds/posts/default?alt=rss" type="rss" text="Christer's Ramblings" title="Christer's Ramblings RSS" htmlUrl="http://blog.weinigel.se/" />
+    <outline xmlUrl="http://ohmansmatovin.com/feed/" type="rss" text="&#214;hmans Mat &amp; Vin" title="&#214;hmans Mat &amp; Vin" htmlUrl="http://ohmansmatovin.com" />
+    <outline xmlUrl="http://ewontfix.com/feed.rss" type="rss" text="EWONTFIX" title="EWONTFIX" htmlUrl="http://ewontfix.com" />
+    <outline xmlUrl="http://dangerousprototypes.com/feed" type="rss" text="Dangerous Prototypes" title="Dangerous Prototypes" htmlUrl="http://dangerousprototypes.com" />
+    <outline xmlUrl="http://feeds.feedburner.com/scoutingny" type="rss" text="Scouting NY" title="Scouting NY" htmlUrl="http://www.scoutingny.com" />
+    <outline xmlUrl="http://fredrik.cafe.se/feed/" type="rss" text="Fredrik Backman" title="Fredrik Backman" htmlUrl="http://fredrik.cafe.se" />
+    <outline xmlUrl="http://blog.chembark.com/feed/" type="rss" text="ChemBark" title="ChemBark" htmlUrl="http://blog.chembark.com" />
+    <outline xmlUrl="http://www.barnakuten.nu/feed/" type="rss" text="Barnakuten.nu" title="Barnakuten.nu" htmlUrl="http://www.barnakuten.nu" />
+    <outline xmlUrl="http://feeds.feedburner.com/freethoughtblogs/pharyngula" type="rss" text="Pharyngula" title="Pharyngula" htmlUrl="http://freethoughtblogs.com/pharyngula" />
+    <outline xmlUrl="http://feeds2.feedburner.com/voynichnews" type="rss" text="Cipher MysteriesCipher MysteriesCipher Mysteries" title="Cipher Mysteries" htmlUrl="http://www.ciphermysteries.com" />
+    <outline xmlUrl="http://javlaskitsystem.se/feed/rss/" type="rss" text="J&#228;vla skitsystem!" title="J&#228;vla skitsystem! RSS" htmlUrl="http://javlaskitsystem.se" />
+    <outline xmlUrl="http://ohmansmatovin.com/feed/" type="rss" text="&#214;hmans Mat &amp; Vin" title="&#214;hmans Mat &amp; Vin" htmlUrl="http://ohmansmatovin.com" />
+    <outline xmlUrl="http://profmattstrassler.com/feed/" type="rss" text="Of Particular Significance" title="Of Particular Significance" htmlUrl="http://profmattstrassler.com" />
+    <outline xmlUrl="http://sakerhetsbimbo.se/feed/" type="rss" text="S&#228;kerhetsbimbo.se" title="S&#228;kerhetsbimbo.se" htmlUrl="http://sakerhetsbimbo.se" />
+    <outline xmlUrl="http://scienceblogs.com/startswithabang/feed/" type="rss" text="Starts With A Bang" title="Starts With A Bang" htmlUrl="http://scienceblogs.com/startswithabang" />
+    <outline xmlUrl="http://www.badscience.net/feed/" type="rss" text="Bad Science" title="Bad Science" htmlUrl="http://www.badscience.net" />
+    <outline xmlUrl="http://dangerousprototypes.com/feed" type="rss" text="Dangerous Prototypes" title="Dangerous Prototypes" htmlUrl="http://dangerousprototypes.com" />
+    <outline xmlUrl="http://feeds.feedburner.com/FoSCombinedFeed" type="rss" text="Field of Science Combined Feed" title="Field of Science Combined Feed" htmlUrl="http://pipes.yahoo.com/pipes/pipe.info?_id=PoOyY8v63RGxv8s3bbsjiw" />
+    <outline xmlUrl="http://www.corante.com/pipeline/index.xml" type="rss" text="In the Pipeline" title="In the Pipeline" htmlUrl="/home/corante/public_html/pipeline/" />
+    <outline xmlUrl="http://iloapp.ralfsundberg.se/blog/blogg?RSS" type="rss" text="Docent Ralf Sundberg kommenterar Feed" title="Docent Ralf Sundberg kommenterar Feed" htmlUrl="http://blogg.ralfsundberg.se/" />
+    <outline xmlUrl="http://proffskoket.blogg.se/index.rss" type="rss" text="proffsk&#246;ket&#8482;" title="proffsk&#246;ket&#8482;" htmlUrl="http://proffskoket.blogg.se" />
+
+	<!-- atom feeds -->
+    <outline xmlUrl="http://blog.weinigel.se/feeds/posts/default" type="rss" text="Christer's Ramblings" title="Christer's Ramblings Atom" htmlUrl="http://blog.weinigel.se/" />
+    <outline xmlUrl="https://www.schneier.com/blog/atom.xml" type="atom" text="Schneier on Security" title="Schneier on Security" htmlUrl="https://www.schneier.com/blog/" />
+    <outline xmlUrl="http://columbiegg.com/outstanding/atom/1" type="atom" text="Outstanding Experiments" title="Outstanding Experiments" htmlUrl="http://columbiegg.com/outstanding/" />
+    <outline xmlUrl="http://api.flickr.com/services/feeds/photos_public.gne?id=51148630&#64;N08&amp;amp;lang=en-us&amp;amp;format=rss_200" type="atom" text="Uploads from bjoele" title="Uploads from bjoele" htmlUrl="http://www.flickr.com/photos/bjoele/" />
+    <outline xmlUrl="http://advgamer.blogspot.com/feeds/posts/default" type="atom" text="The Adventure Gamer" title="The Adventure Gamer" htmlUrl="http://advgamer.blogspot.com/" />
+    <outline xmlUrl="http://feeds.feedburner.com/TheCrpgAddict" type="atom" text="The CRPG Addict" title="The CRPG Addict" htmlUrl="http://crpgaddict.blogspot.com/" />
+    <outline xmlUrl="http://dagensviktigaste.blogspot.com/feeds/posts/default" type="atom" text="Dagens viktigaste" title="Dagens viktigaste" htmlUrl="http://dagensviktigaste.blogspot.com/" />
+    <outline xmlUrl="http://humanistbloggen.blogspot.com/feeds/posts/default" type="atom" text="Humanistbloggen" title="Humanistbloggen" htmlUrl="http://humanistbloggen.blogspot.com/" />
+    <outline xmlUrl="http://www.ofiltrerat.se/feeds/posts/default" type="atom" text="Ofiltrerat - en &#246;ldrickares tankar" title="Ofiltrerat - en &#246;ldrickares tankar" htmlUrl="http://www.ofiltrerat.se/" />
+    <outline xmlUrl="http://www.vemihelvete.se/feeds/posts/default" type="atom" text="Vem i helvete?" title="Vem i helvete?" htmlUrl="http://www.vemihelvete.se/" />
+    <outline xmlUrl="http://javlaskitsystem.se/feed/atom/" type="atom" text="J&#228;vla skitsystem!" title="J&#228;vla skitsystem! Atom" htmlUrl="http://javlaskitsystem.se" />
+    <outline xmlUrl="http://feeds.feedburner.com/LoweringTheBar" type="atom" text="Lowering the Bar" title="Lowering the Bar" htmlUrl="http://www.loweringthebar.net/" />
+    <outline xmlUrl="http://feeds.feedburner.com/Popehat" type="rss" text="Popehat" title="Popehat" htmlUrl="http://www.popehat.com" />
+    <outline xmlUrl="https://www.schneier.com/blog/atom.xml" type="atom" text="Schneier on Security" title="Schneier on Security" htmlUrl="https://www.schneier.com/blog/" />
+  </body>
+</opml>
