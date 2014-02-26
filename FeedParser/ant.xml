@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<project name="FeedClass" default="dist">
+  <target name="dist" description="Create dist files">
+        <jar jarfile="dist/FeedParser.jar" basedir="bin/src" includes="**/*.class" />
+  </target>
+  <target name="clean" description="Create Jar file">
+        <delete dir="dist" />
+  </target>
+</project>
