@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/kxml2-src-2.3.0.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlpull_1_1_3_1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
