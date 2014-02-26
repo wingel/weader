@@ -1,8 +1,5 @@
 package se.weinigel.weader;
 
-import java.util.Date;
-
-import se.weinigel.weader.R;
 import se.weinigel.weader.contract.WeadContract;
 import android.content.Context;
 import android.content.res.Resources;
@@ -12,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,14 +20,13 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 	private final String LOG_TAG = getClass().getSimpleName();
 
 	protected static final String[] PROJECTION = new String[] {
-			WeadContract.Article.COLUMN_ID, WeadContract.Article.COLUMN_TITLE,
-			WeadContract.Article.COLUMN_PUB_DATE,
-			WeadContract.Article.COLUMN_READ,
-			WeadContract.Article.COLUMN_FAVORITE };
+			WeadContract.Articles._ID, WeadContract.Articles._TITLE,
+			WeadContract.Articles._PUBLISHED,
+			WeadContract.Articles._READ,
+			WeadContract.Articles._FAVORITE };
 
 	private int mItemNotselectedText;
 	private int mItemSelectedText;
-	private CharSequence mDatePattern;
 
 	public interface ArticleListListener {
 		public void onClickFavorite(long l);
@@ -59,14 +54,13 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 		final Resources res = context.getResources();
 		mItemSelectedText = res.getColor(R.color.item_selected_text);
 		mItemNotselectedText = res.getColor(R.color.item_notselected_text);
-		mDatePattern = res.getText(R.string.pubdate_format_pattern);
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		long id = cursor.getLong(0);
 		String title = cursor.getString(1);
-		Date date = new Date(cursor.getLong(2));
+		String date = cursor.getString(2);
 		int read = cursor.getInt(3);
 		int fav = cursor.getInt(4);
 
@@ -85,9 +79,7 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 		}
 
 		if (dateView != null) {
-			String formattedDate = DateFormat.format(mDatePattern, date)
-					.toString();
-			dateView.setText(formattedDate);
+			dateView.setText(date);
 			dateView.setTextColor(mItemNotselectedText);
 			dateView.setTextColor(mItemSelectedText);
 		}
@@ -108,8 +100,8 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		Log.d(LOG_TAG, Helper.getMethodName());
 
-		long feedId = args != null ? args
-				.getLong(WeadContract.Article.COLUMN_ID) : -1;
+		long feedId = args != null ? args.getLong(WeadContract.Articles._ID)
+				: -1;
 
 		String selection = null;
 		String selectionArgs[] = null;
@@ -119,8 +111,8 @@ final class ArticleListAdapter extends SimpleCursorAdapter implements
 		}
 
 		return new ErrorCheckingCursorLoader(mContext,
-				WeadContract.Article.CONTENT_URI, PROJECTION, selection,
-				selectionArgs, null);
+				WeadContract.Articles.CONTENT_URI, PROJECTION, selection,
+				selectionArgs, "_id DESC");
 	}
 
 	@Override

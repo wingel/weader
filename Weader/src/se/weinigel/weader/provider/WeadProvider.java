@@ -26,14 +26,13 @@ public class WeadProvider extends ContentProvider {
 		Log.d(LOG_TAG, Helper.getMethodName());
 
 		mDbHelper = new DbHelper(getContext());
-		mDbHelper.hack();
 		mDb = mDbHelper.getWritableDatabase();
 
 		mColumnProviders = new ArrayList<SimpleProvider>();
 		mUriMatcher = new UriMatcher(-1);
 
-		addProvider(WeadContract.Feed.BASE_NAME, new FeedProvider(this));
-		addProvider(WeadContract.Article.BASE_NAME, new ArticleProvider(this));
+		addProvider(WeadContract.Feeds.BASE_NAME, new FeedProvider(this));
+		addProvider(WeadContract.Articles.BASE_NAME, new ArticleProvider(this));
 
 		return true;
 	}

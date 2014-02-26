@@ -35,7 +35,7 @@ public class RSS2FeedParser extends RSSParser {
 				// System.out.println(entry.raw);
 				System.out.println();
 
-				feed.articles.add(article);
+				feed.articles.push(article);
 			} else if ("title".equals(name)) {
 				feed.title = parseTextNormalized(parser);
 				System.out.println("feed title: " + feed.title);
@@ -56,7 +56,8 @@ public class RSS2FeedParser extends RSSParser {
 				}
 				parser.nextTag();
 			} else if ("link".equals(name)) {
-				// TODO rss feeds can contain <atom:link> tags (xmlns:atom="http://www.w3.org/2005/Atom")
+				// TODO rss feeds can contain <atom:link> tags
+				// (xmlns:atom="http://www.w3.org/2005/Atom")
 				String link = parseTextNormalized(parser);
 				if (!link.isEmpty()) {
 					feed.alternate = link;

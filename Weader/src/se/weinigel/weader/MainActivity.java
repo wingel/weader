@@ -1,7 +1,7 @@
 package se.weinigel.weader;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -10,6 +10,7 @@ import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import se.weinigel.weader.service.AddFeedService;
 import se.weinigel.weader.service.UpdateFeedService;
+import se.weinigel.weader.service.LegacyUpdateService;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -60,7 +61,13 @@ public class MainActivity extends FragmentActivity implements
 
 	private AddFeedServiceReceiver addServiceReceiver;
 
+	private LegacyServiceReceiver legacyServiceReceiver;
+
 	private HashSet<Long> refreshing = new HashSet<Long>();
+
+	private boolean mLegacyMode;
+
+	private File mLegacyDbPath;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +85,10 @@ public class MainActivity extends FragmentActivity implements
 
 		ListView listView = (ListView) findViewById(R.id.list);
 
+		System.out.println("legacy db " + mLegacyDbPath);
+
+		checkLegacyDb();
+
 		mListAdapter = new FeedListAdapter(this);
 		listView.setAdapter(mListAdapter);
 		getSupportLoaderManager().initLoader(0, getIntent().getExtras(),
@@ -91,7 +102,7 @@ public class MainActivity extends FragmentActivity implements
 					int position, long id) {
 				Intent intent = new Intent(MainActivity.this,
 						ArticleListActivity.class);
-				intent.putExtra(WeadContract.Article.COLUMN_ID, id);
+				intent.putExtra(WeadContract.Articles._ID, id);
 				startActivity(intent);
 			}
 		});
@@ -115,6 +126,31 @@ public class MainActivity extends FragmentActivity implements
 		registerLocalReceiver(addServiceReceiver, addServiceFilter);
 	}
 
+	private void checkLegacyDb() {
+		mLegacyDbPath = getDatabasePath("dbfeed");
+
+		if (mLegacyDbPath.exists()) {
+			System.out.println("legacy db exists");
+
+			mLegacyMode = true;
+
+			if (true) {
+				Toast toast = Toast.makeText(MainActivity.this,
+						R.string.legacy_upgrade_started, Toast.LENGTH_SHORT);
+				toast.show();
+			}
+
+			IntentFilter legacyFilter = new IntentFilter(
+					LegacyUpdateService.RESPONSE_ACTION);
+			legacyFilter.addCategory(Intent.CATEGORY_DEFAULT);
+			legacyServiceReceiver = new LegacyServiceReceiver();
+			registerLocalReceiver(legacyServiceReceiver, legacyFilter);
+
+			Intent intent = new Intent(this, LegacyUpdateService.class);
+			startService(intent);
+		}
+	}
+
 	private void addFeed(Uri uri, boolean fuzzy) {
 		Intent addIntent = new Intent(MainActivity.this, AddFeedService.class);
 		addIntent.setData(uri);
@@ -125,6 +161,8 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	protected void onDestroy() {
+		if (legacyServiceReceiver != null)
+			unregisterLocalReceiver(legacyServiceReceiver);
 		unregisterLocalReceiver(addServiceReceiver);
 		unregisterLocalReceiver(updateServiceReceiver);
 		super.onDestroy();
@@ -139,8 +177,8 @@ public class MainActivity extends FragmentActivity implements
 		Log.d(LOG_TAG, "updateUi feedsBusy " + mListAdapter.isBusy() + " add "
 				+ addFeedBusy.isEmpty());
 
-		setProgressBarIndeterminateVisibility(mListAdapter.isBusy()
-				|| !addFeedBusy.isEmpty());
+		setProgressBarIndeterminateVisibility(mLegacyMode
+				|| mListAdapter.isBusy() || !addFeedBusy.isEmpty());
 	}
 
 	@Override
@@ -284,7 +322,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 
 			protected void onPostExecute(Void result) {
-				CharSequence text = "Feed deleted";
+				CharSequence text = "Feeds deleted";
 				Toast toast = Toast.makeText(MainActivity.this, text,
 						Toast.LENGTH_SHORT);
 				toast.show();
@@ -300,14 +338,14 @@ public class MainActivity extends FragmentActivity implements
 		refreshing.add(feedId);
 		Log.d(LOG_TAG, "starting UpdateFeedService " + feedId);
 		Intent intent = new Intent(this, UpdateFeedService.class);
-		intent.putExtra(WeadContract.Feed.COLUMN_ID, feedId);
+		intent.putExtra(WeadContract.Feeds._ID, feedId);
 		startService(intent);
 	}
 
 	private void startRefreshAll() {
 		Cursor cursor = mListAdapter.getCursor();
 		cursor.moveToFirst();
-		int idCol = cursor.getColumnIndex(WeadContract.Feed.COLUMN_ID);
+		int idCol = cursor.getColumnIndex(WeadContract.Feeds._ID);
 		while (!cursor.isAfterLast()) {
 			long id = cursor.getLong(idCol);
 			startRefresh(id);
@@ -318,11 +356,10 @@ public class MainActivity extends FragmentActivity implements
 	private void startAutoRefresh() {
 		Cursor cursor = mListAdapter.getCursor();
 		cursor.moveToFirst();
-		int idCol = cursor.getColumnIndex(WeadContract.Feed.COLUMN_ID);
-		int titleCol = cursor.getColumnIndex(WeadContract.Feed.COLUMN_TITLE);
-		int refreshCol = cursor
-				.getColumnIndex(WeadContract.Feed.COLUMN_REFRESH);
-		long now = new Date().getTime();
+		int idCol = cursor.getColumnIndex(WeadContract.Feeds._ID);
+		int titleCol = cursor.getColumnIndex(WeadContract.Feeds._TITLE);
+		int refreshCol = cursor.getColumnIndex(WeadContract.Feeds._REFRESH);
+		long now = System.currentTimeMillis();
 		while (!cursor.isAfterLast()) {
 			long refresh = cursor.getLong(refreshCol);
 			Log.d(LOG_TAG, "refresh " + cursor.getString(titleCol) + " "
@@ -350,7 +387,7 @@ public class MainActivity extends FragmentActivity implements
 	public class UpdateFeedServiceReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			long feedId = intent.getLongExtra(WeadContract.Feed.COLUMN_ID, -1);
+			long feedId = intent.getLongExtra(WeadContract.Feeds._ID, -1);
 			String response = intent.getStringExtra(UpdateFeedService.RESPONSE);
 
 			Log.d(LOG_TAG, "response received " + feedId + " " + response);
@@ -494,8 +531,49 @@ public class MainActivity extends FragmentActivity implements
 		context.startActivity(newIntent);
 	}
 
+	public class LegacyServiceReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String response = intent
+					.getStringExtra(LegacyUpdateService.RESPONSE);
+
+			Uri uri = intent.getData();
+			Log.d(LOG_TAG, "response received " + uri + " " + response);
+
+			if (LegacyUpdateService.RESPONSE_PROGRESS.equals(response)) {
+				updateUi();
+				updateList();
+			} else if (LegacyUpdateService.RESPONSE_SUCCESS.equals(response)) {
+				mLegacyMode = false;
+				mLegacyDbPath.delete();
+				new File(mLegacyDbPath.toString() + "-journal").delete();
+				mLegacyDbPath = null;
+				Toast toast = Toast.makeText(MainActivity.this,
+						R.string.legacy_upgrade_success, Toast.LENGTH_SHORT);
+				toast.show();
+				updateUi();
+				updateList();
+			} else if (LegacyUpdateService.RESPONSE_FAILURE.equals(response)) {
+				mLegacyMode = false;
+				mLegacyDbPath.renameTo(new File(mLegacyDbPath.toString()
+						+ ".bak"));
+				mLegacyDbPath = null;
+				// TODO this should be a proper error dialog
+				// TODO make backup of database to sdcard
+				Toast toast = Toast.makeText(MainActivity.this,
+						R.string.legacy_upgrade_failure, Toast.LENGTH_SHORT);
+				toast.show();
+				updateUi();
+				updateList();
+			}
+		}
+	}
+
 	@Override
 	public void onLoadFinished() {
+		if (mLegacyMode)
+			return;
+
 		startAutoRefresh();
 	}
 }

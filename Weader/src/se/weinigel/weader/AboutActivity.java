@@ -25,7 +25,8 @@ public class AboutActivity extends Activity {
 		} catch (NameNotFoundException e) {
 			versionName = "unknown";
 		}
-		String versionString = getResources().getString(R.string.about_version, versionName);
+		String versionString = getResources().getString(R.string.about_version,
+				versionName);
 
 		TextView versionView = (TextView) findViewById(R.id.version);
 		if (versionView != null)

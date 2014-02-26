@@ -52,7 +52,7 @@ public class ArticlePagerActivity extends FragmentActivity implements
 
 		Bundle extras = getIntent().getExtras();
 		long articleId = extras != null ? extras
-				.getLong(WeadContract.Article.COLUMN_ID) : -1;
+				.getLong(WeadContract.Articles._ID) : -1;
 
 		if (articleId != -1) {
 			AsyncTask<Long, Void, Bundle> task = new InfoTask();
@@ -81,9 +81,9 @@ public class ArticlePagerActivity extends FragmentActivity implements
 			try {
 				Cursor cursor;
 				cursor = getContentResolver().query(
-						WeadContract.Article.CONTENT_URI,
-						new String[] { WeadContract.Article.COLUMN_FEED_ID, },
-						WeadContract.Article.COLUMN_ID + "=?",
+						WeadContract.Articles.CONTENT_URI,
+						new String[] { WeadContract.Articles._FEED_ID, },
+						WeadContract.Articles._ID + "=?",
 						new String[] { articleId.toString() }, null);
 				cursor.moveToFirst();
 				if (cursor.isAfterLast()) {
@@ -94,9 +94,9 @@ public class ArticlePagerActivity extends FragmentActivity implements
 				cursor.close();
 
 				cursor = getContentResolver().query(
-						WeadContract.Feed.CONTENT_URI,
-						new String[] { WeadContract.Feed.COLUMN_TITLE },
-						WeadContract.Feed.COLUMN_ID + "=?",
+						WeadContract.Feeds.CONTENT_URI,
+						new String[] { WeadContract.Feeds._TITLE },
+						WeadContract.Feeds._ID + "=?",
 						new String[] { Long.toString(feedId) }, null);
 				cursor.moveToFirst();
 				if (cursor.isAfterLast()) {
@@ -141,7 +141,7 @@ public class ArticlePagerActivity extends FragmentActivity implements
 		Cursor cursor = mPagerAdapter.getCursor();
 		cursor.moveToPosition(position);
 		final long id = cursor.getLong(cursor
-				.getColumnIndex(WeadContract.Article.COLUMN_ID));
+				.getColumnIndex(WeadContract.Articles._ID));
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... params) {
@@ -235,7 +235,7 @@ public class ArticlePagerActivity extends FragmentActivity implements
 		Intent intent = new Intent();
 		intent.setAction(ARTICLE_SELECTED);
 		intent.addCategory(Intent.CATEGORY_DEFAULT);
-		intent.putExtra(WeadContract.Article.COLUMN_ID, getCurrentArticleId());
+		intent.putExtra(WeadContract.Articles._ID, getCurrentArticleId());
 		sendBroadcast(intent);
 
 		super.onPause();

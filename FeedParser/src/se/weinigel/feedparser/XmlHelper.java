@@ -83,7 +83,7 @@ public class XmlHelper {
 			;
 	}
 
-	protected static XmlSerializer createSerializer(Writer writer)
+	public static XmlSerializer createSerializer(Writer writer)
 			throws XmlPullParserException, IOException {
 		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 		XmlSerializer serializer = factory.newSerializer();

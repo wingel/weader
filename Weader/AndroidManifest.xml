@@ -28,6 +28,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="se.weinigel.weader.AddFeedActivity"
+            android:label="@string/app_name" >
 
             <!--
                  The following intent catches the feed URI scheme as
@@ -91,10 +95,6 @@
                 <data android:host="feedproxy.google.com" />
                 <data android:host="feedsproxy.google.com" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="se.weinigel.weader.AddFeedActivity"
-            android:label="@string/app_name" >
 
             <!--
                  Try to identify feeds based on the path.  This is
@@ -134,7 +134,32 @@
                     android:pathPattern=".*RSS" />
                 <data
                     android:host="*"
-                    android:pathPattern=".*atom" />
+                    android:pathPattern=".*\\.atom" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\.opml" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\..*\\.opml" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\..*\\..*\\.opml" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*\\..*\\..*\\..*\\.opml" />
+            </intent-filter>
+
+            <!-- Handle OPML files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:pathPattern=".*opml" />
             </intent-filter>
         </activity>
         <activity
@@ -182,6 +207,10 @@
             android:readPermission="se.weinigel.weader.provider.READ"
             android:writePermission="se.weinigel.weader.provider.WRITE" />
 
+        <service
+            android:name="se.weinigel.weader.service.LegacyUpdateService"
+            android:enabled="true"
+            android:exported="false" />
         <service
             android:name="se.weinigel.weader.service.AddFeedService"
             android:enabled="true"

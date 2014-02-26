@@ -68,7 +68,7 @@ public class ArticleListActivity extends FragmentActivity implements
 		mListAdapter.setListener(this);
 
 		Bundle args = getIntent().getExtras();
-		mFeedId = args != null ? args.getLong(WeadContract.Feed.COLUMN_ID) : -1;
+		mFeedId = args != null ? args.getLong(WeadContract.Feeds._ID) : -1;
 		if (mFeedId != -1) {
 			AsyncTask<Long, Void, Bundle> task = new InfoTask();
 			task.execute(mFeedId);
@@ -81,7 +81,7 @@ public class ArticleListActivity extends FragmentActivity implements
 					int position, long id) {
 				Intent intent = new Intent(ArticleListActivity.this,
 						ArticlePagerActivity.class);
-				intent.putExtra(WeadContract.Article.COLUMN_ID, id);
+				intent.putExtra(WeadContract.Articles._ID, id);
 				startActivity(intent);
 			}
 		});
@@ -125,9 +125,9 @@ public class ArticleListActivity extends FragmentActivity implements
 			try {
 				Cursor cursor;
 				cursor = getContentResolver().query(
-						WeadContract.Feed.CONTENT_URI,
-						new String[] { WeadContract.Feed.COLUMN_TITLE },
-						WeadContract.Feed.COLUMN_ID + "=?",
+						WeadContract.Feeds.CONTENT_URI,
+						new String[] { WeadContract.Feeds._TITLE },
+						WeadContract.Feeds._ID + "=?",
 						new String[] { Long.toString(feedId) }, null);
 				cursor.moveToFirst();
 				if (cursor.isAfterLast()) {
@@ -203,9 +203,9 @@ public class ArticleListActivity extends FragmentActivity implements
 			Cursor cursor = mListAdapter.getCursor();
 			cursor.moveToPosition(mListSelectedPos);
 			boolean read = "1".equals(cursor.getString(cursor
-					.getColumnIndex(WeadContract.Article.COLUMN_READ)));
+					.getColumnIndex(WeadContract.Articles._READ)));
 			boolean fav = "1".equals(cursor.getString(cursor
-					.getColumnIndex(WeadContract.Article.COLUMN_FAVORITE)));
+					.getColumnIndex(WeadContract.Articles._FAVORITE)));
 			MenuItem readMenu = menu.findItem(R.id.action_mark_read);
 			if (readMenu != null)
 				readMenu.setVisible(!read);
@@ -332,8 +332,7 @@ public class ArticleListActivity extends FragmentActivity implements
 		@SuppressLint("NewApi")
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			long articleId = intent.getLongExtra(
-					WeadContract.Article.COLUMN_ID, -1);
+			long articleId = intent.getLongExtra(WeadContract.Articles._ID, -1);
 
 			Log.d(LOG_TAG, "response received " + articleId);
 
@@ -351,7 +350,7 @@ public class ArticleListActivity extends FragmentActivity implements
 	public class UpdateFeedServiceReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			long feedId = intent.getLongExtra(WeadContract.Feed.COLUMN_ID, -1);
+			long feedId = intent.getLongExtra(WeadContract.Feeds._ID, -1);
 			String response = intent.getStringExtra(UpdateFeedService.RESPONSE);
 
 			Log.d(LOG_TAG, "response received " + feedId + " " + response);
@@ -370,7 +369,7 @@ public class ArticleListActivity extends FragmentActivity implements
 	private void startRefresh() {
 		Log.d(LOG_TAG, "starting UpdateFeedService " + mFeedId);
 		Intent intent = new Intent(this, UpdateFeedService.class);
-		intent.putExtra(WeadContract.Feed.COLUMN_ID, mFeedId);
+		intent.putExtra(WeadContract.Feeds._ID, mFeedId);
 		startService(intent);
 	}
 
@@ -392,11 +391,11 @@ public class ArticleListActivity extends FragmentActivity implements
 	public void onClickFavorite(long id) {
 		Cursor cursor = mListAdapter.getCursor();
 		cursor.moveToFirst();
-		int idCol = cursor.getColumnIndex(WeadContract.Article.COLUMN_ID);
+		int idCol = cursor.getColumnIndex(WeadContract.Articles._ID);
 		while (!cursor.isAfterLast()) {
 			if (cursor.getLong(idCol) == id) {
 				boolean fav = "1".equals(cursor.getString(cursor
-						.getColumnIndex(WeadContract.Article.COLUMN_FAVORITE)));
+						.getColumnIndex(WeadContract.Articles._FAVORITE)));
 				setFav(id, !fav);
 			}
 			cursor.moveToNext();

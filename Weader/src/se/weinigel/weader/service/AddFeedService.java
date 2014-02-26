@@ -1,9 +1,19 @@
 package se.weinigel.weader.service;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.HashSet;
+import java.net.URLConnection;
+import java.util.List;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import se.weinigel.feedparser.Feed;
+import se.weinigel.feedparser.FeedParser;
+import se.weinigel.feedparser.OpmlHelper;
+import se.weinigel.feedparser.UrlHelper;
+import se.weinigel.feedparser.XmlHelper;
 import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import android.app.IntentService;
@@ -11,9 +21,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.mfavez.android.feedgoal.FeedHandler;
-import com.mfavez.android.feedgoal.common.Feed;
 
 public class AddFeedService extends IntentService {
 	private static final String LOG_TAG = AddFeedService.class.getSimpleName();
@@ -66,55 +73,92 @@ public class AddFeedService extends IntentService {
 		respond(uri, RESPONSE_START);
 
 		try {
-			HashSet<String> existing = new HashSet<String>();
+			String string = uri.toString();
 
-			String url = uri.toString();
-
-			if (mContentHelper.hasFeed(url)) {
+			if (mContentHelper.hasFeed(string)) {
+				Log.d(LOG_TAG, "feed already exists (1)");
 				respond(uri, RESPONSE_EXISTS);
 				return;
 			}
 
-			FeedHandler feedHandler = new FeedHandler(this);
+			Log.d(LOG_TAG, "fetching new feed from " + uri);
 
-			Log.d(LOG_TAG, "fetching new feed from " + url);
-			URL url2;
-			try {
-				url2 = new URL(url);
-			} catch (MalformedURLException e) {
-				if (!fuzzy)
-					throw e;
-				url = "http://" + url;
-				url2 = new URL(url);
+			URL url = new URL(uri.toString());
+
+			UrlHelper urlHelper = mContentHelper.createUrlHelper();
+
+			System.out.println(url);
+
+			URLConnection conn = urlHelper.connect(url);
+
+			InputStream in = conn.getInputStream();
+			XmlPullParser parser = XmlHelper.createParser(in);
+
+			System.out.println("type " + parser.getName());
+
+			if (mContentHelper.hasFeed(conn.getURL().toExternalForm())) {
+				Log.d(LOG_TAG, "feed already exists (3)");
+				respond(uri, RESPONSE_EXISTS);
+				return;
 			}
 
-			Feed feed;
-			try {
-				feed = feedHandler.handleFeed(url2);
-			} catch (Exception e) {
-				if (!fuzzy)
-					throw e;
+			String tag = parser.getName();
+			if ("opml".equals(tag)) {
+				List<Feed> feeds = OpmlHelper.parseOpml(parser);
+				in.close();
 
-				url2 = new URL(url + "/feeds/posts/default");
-				try {
-					feed = feedHandler.handleFeed(url2);
-				} catch (Exception e2) {
-					if (!fuzzy)
-						throw e2;
+				for (Feed feed : feeds) {
+					System.out.println("Fetching " + feed.url);
 
-					url2 = new URL(url + "/feed/");
-					feed = feedHandler.handleFeed(url2);
+					if (mContentHelper.hasFeed(feed.url)) {
+						Log.d(LOG_TAG, "feed already exists (4)");
+						continue;
+					}
+
+					try {
+						conn = urlHelper.connect(new URL(feed.url));
+
+						if (mContentHelper.hasFeed(conn.getURL()
+								.toExternalForm())) {
+							Log.d(LOG_TAG, "feed already exists (5)");
+							continue;
+						}
+
+						in = conn.getInputStream();
+						parser = XmlHelper.createParser(in);
+						Feed newFeed = fetch(conn, parser);
+
+						if (feed.title != null)
+							newFeed.title = feed.title;
+
+						// TODO maybe tell the user if the feed has changed
+						// names
+
+						mContentHelper.insertFeed(newFeed);
+					} catch (IOException e) {
+						Log.d(LOG_TAG, "failed to fetch feed", e);
+					} catch (XmlPullParserException e) {
+						Log.d(LOG_TAG, "failed to parse feed", e);
+					}
 				}
-			}
 
-			Log.d(LOG_TAG, "feed title " + feed.getTitle());
-
-			if (existing.contains(feed.getURL().toString())) {
-				respond(uri, RESPONSE_EXISTS);
+				respond(uri, RESPONSE_ADDED);
 				return;
 			}
 
-			mContentHelper.insertFeed(feed);
+			try {
+				Feed feed = fetch(conn, parser);
+				mContentHelper.insertFeed(feed);
+			} catch (IOException e) {
+				Log.d(LOG_TAG, "failed to fetch feed", e);
+				respond(uri, RESPONSE_ERROR);
+				return;
+			} catch (XmlPullParserException e) {
+				Log.d(LOG_TAG, "failed to parse feed", e);
+				respond(uri, RESPONSE_ERROR);
+				return;
+			}
+
 			respond(uri, RESPONSE_ADDED);
 		} catch (Exception e) {
 			Log.d(LOG_TAG, "exception", e);
@@ -123,11 +167,27 @@ public class AddFeedService extends IntentService {
 		}
 	}
 
+	private Feed fetch(URLConnection conn, XmlPullParser parser)
+			throws XmlPullParserException, IOException {
+		Feed feed = FeedParser.parseFeed(parser);
+		feed.url = conn.getURL().toExternalForm();
+		feed.lastModified = conn.getHeaderField("Last-Modified");
+		feed.etag = conn.getHeaderField("ETag");
+		System.out.println("lastModified: " + feed.lastModified);
+		System.out.println("etag: " + feed.etag);
+
+		Log.d(LOG_TAG, "feed title " + feed.title);
+
+		feed.refresh = System.currentTimeMillis();
+
+		return feed;
+	}
+
 	private void respond(Uri uri, String response) {
 		Intent intent = new Intent();
 		intent.setAction(RESPONSE_ACTION);
 		intent.addCategory(Intent.CATEGORY_DEFAULT);
-		intent.putExtra(WeadContract.Feed.COLUMN_URL, uri);
+		intent.putExtra(WeadContract.Feeds._URL, uri);
 		intent.putExtra(RESPONSE, response);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}

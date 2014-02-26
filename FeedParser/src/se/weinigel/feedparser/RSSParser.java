@@ -1,6 +1,8 @@
 package se.weinigel.feedparser;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -73,6 +75,13 @@ public class RSSParser extends XmlHelper {
 
 		if (article.guid == null)
 			article.guid = article.alternate;
+
+		if (article.alternate == null && article.guid != null) {
+			try {
+				article.alternate = new URL(article.guid).toExternalForm();
+			} catch (MalformedURLException e) {
+			}
+		}
 
 		// TODO parse dates
 

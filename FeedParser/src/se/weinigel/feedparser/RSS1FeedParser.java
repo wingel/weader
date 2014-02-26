@@ -38,7 +38,7 @@ public class RSS1FeedParser extends RSSParser {
 				// System.out.println(entry.raw);
 				System.out.println();
 
-				feed.articles.add(article);
+				feed.articles.push(article);
 			} else {
 				skip(parser);
 			}

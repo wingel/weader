@@ -1,12 +1,9 @@
 package se.weinigel.weader.provider;
 
-import java.util.Arrays;
-import java.util.List;
-
 import se.weinigel.weader.contract.WeadContract;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteQueryBuilder;
+import android.database.SQLException;
 import android.net.Uri;
 import android.util.Log;
 
@@ -19,55 +16,86 @@ public class FeedProvider extends SimpleProvider {
 
 	@Override
 	public String getType(Uri uri) {
-		return WeadContract.Feed.CONTENT_TYPE;
+		return WeadContract.Feeds.CONTENT_TYPE;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		List<String> columns = Arrays.asList(projection);
-		boolean wantsUnread = columns.contains(WeadContract.Feed.COLUMN_UNREAD);
-
-		String table = DbSchema.FeedSchema.TABLE_NAME;
-		if (wantsUnread)
-			table = "feeds_unread";
-
-		if (sortOrder == null)
-			sortOrder = WeadContract.Feed.SORT_ORDER_DEFAULT;
-
-		Cursor cursor;
-		if (false) {
-			cursor = getDb().query(table, projection, selection, selectionArgs,
-					null, null, sortOrder);
-		} else {
-			SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-			qb.setTables(table);
-			String sql = qb.buildQuery(projection, selection, selectionArgs,
-					null, null, sortOrder, null);
-			Log.d(LOG_TAG, sql);
-			cursor = getDb().rawQuery(sql, selectionArgs);
+		boolean wantUnread = false;
+		String sql = "SELECT ";
+		for (int i = 0; i < projection.length; i++) {
+			if (i > 0)
+				sql += ",";
+			String column = projection[i];
+			if (WeadContract.Feeds._UNREAD.equals(column)) {
+				sql += "COUNT(article._id) AS " + WeadContract.Feeds._UNREAD;
+				wantUnread = true;
+			} else if (DbHelper.FEED_COLUMNS.contains(column)) {
+				sql += "feed." + column + " AS " + column;
+			} else
+				throw new SQLException("invalid column " + column);
 		}
 
-		return cursor;
+		sql += " FROM feed";
+
+		if (wantUnread) {
+			// @formatter:off
+			sql += " OUTER LEFT JOIN article" 
+			     + " ON feed._id=article.feed_id"
+				 + " AND article.read=0 GROUP BY feed._id";
+			// @formatter:on
+		}
+
+		if (selection != null) {
+			// TODO validate selection so that it doesn't do anything strange
+			// For now just limit it to the queries Weader uses
+			if (!"_id=?".equals(selection) && !"url=?".equals(selection)) {
+				Log.d(LOG_TAG, "invalid selection: " + selection);
+				throw new SQLException("invalid selection");
+			}
+			sql += " WHERE " + selection;
+		}
+
+		if (sortOrder != null) {
+			// TODO validate sort order so that it doesn't do anything strange.
+			// For now just limit it to the sort order the Weader GUI uses
+			if (!"title COLLATE LOCALIZED ASC".equals(sortOrder))
+				throw new SQLException("invalid sort order");
+			sql += " ORDER BY " + sortOrder;
+		}
+
+		Log.d(LOG_TAG, sql);
+		return getDb().rawQuery(sql, selectionArgs);
 	}
 
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		long id = getDb().insert(DbSchema.FeedSchema.TABLE_NAME, null, values);
-		return Uri.parse(WeadContract.Feed.CONTENT_URI + "/" + Long.toString(id));
+		long id = getDb().insert("feed", null, values);
+		return Uri.parse(WeadContract.Feeds.CONTENT_URI + "/"
+				+ Long.toString(id));
 	}
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		return getDb().update(DbSchema.FeedSchema.TABLE_NAME, values,
-				selection, selectionArgs);
+		// TODO validate selection so that it doesn't do anything strange
+		// For now just limit it to the queries Weader uses
+		if (!"_id=?".equals(selection)) {
+			Log.d(LOG_TAG, "invalid selection: " + selection);
+			throw new SQLException("invalid selection");
+		}
+		return getDb().update("feed", values, selection, selectionArgs);
 	}
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		return getDb().delete(DbSchema.FeedSchema.TABLE_NAME, selection,
-				selectionArgs);
+		// TODO validate selection so that it doesn't do anything strange
+		// For now just limit it to the queries Weader uses
+		if (!"_id=?".equals(selection)) {
+			Log.d(LOG_TAG, "invalid selection: " + selection);
+			throw new SQLException("invalid selection");
+		}
+		return getDb().delete("feed", selection, selectionArgs);
 	}
 }

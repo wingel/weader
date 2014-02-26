@@ -15,7 +15,7 @@ final class ArticlePagerAdapter extends CursorPagerAdapter<ArticlePageFragment>
 
 	private ArticlePagerActivity mContext;
 
-	protected static final String[] PROJECTION = new String[] { WeadContract.Article.COLUMN_ID };
+	protected static final String[] PROJECTION = new String[] { WeadContract.Articles._ID };
 
 	ArticlePagerAdapter(ArticlePagerActivity context) {
 		super(context.getSupportFragmentManager(), ArticlePageFragment.class,
@@ -38,12 +38,12 @@ final class ArticlePagerAdapter extends CursorPagerAdapter<ArticlePageFragment>
 		}
 
 		return new ErrorCheckingCursorLoader(mContext,
-				WeadContract.Article.CONTENT_URI, PROJECTION,
-				selection, selectionArgs, null);
+				WeadContract.Articles.CONTENT_URI, PROJECTION, selection,
+				selectionArgs, null);
 	}
 
 	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		Log.d(LOG_TAG, Helper.getMethodName());
 
 		/*
@@ -52,16 +52,16 @@ final class ArticlePagerAdapter extends CursorPagerAdapter<ArticlePageFragment>
 		 */
 
 		int idx = 0;
-		if (mArticleId != -1 && data != null) {
-			data.moveToFirst();
-			while (!data.isAfterLast()) {
-				if (data.getLong(0) == mArticleId)
+		if (mArticleId != -1 && cursor != null) {
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				if (cursor.getLong(0) == mArticleId)
 					break;
 				idx++;
-				data.moveToNext();
+				cursor.moveToNext();
 			}
-			data.moveToFirst();
-			if (idx >= data.getCount())
+			cursor.moveToFirst();
+			if (idx >= cursor.getCount())
 				idx = 0;
 		}
 
@@ -70,7 +70,7 @@ final class ArticlePagerAdapter extends CursorPagerAdapter<ArticlePageFragment>
 		 * page 0 and then there's a visible page flip when we call updatePage.
 		 * There must be a better way of doing this.
 		 */
-		swapCursor(data);
+		swapCursor(cursor);
 		mContext.updatePage(idx);
 	}
 

@@ -30,6 +30,17 @@
         <item name="android:indeterminate">true</item>
     </style>
 
+    <style name="item_common_text">
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+    </style>
+
+    <style name="item_common_title" parent="@style/item_common_text">
+        <item name="android:textSize">15dp</item>
+    </style>
+
     <style name="item_feed_title" parent="@style/item_common_title">
         <item name="android:paddingTop">10sp</item>
         <item name="android:paddingBottom">10sp</item>
@@ -38,6 +49,27 @@
     <style name="item_common_fav_icon">
         <item name="android:paddingTop">10sp</item>
         <item name="android:paddingRight">15dp</item>
+    </style>
+
+    <style name="item_common_pubdate" parent="@style/item_common_text">
+        <item name="android:textSize">11dp</item>
+    </style>
+
+    <style name="item_notselected_pubdate" parent="@style/item_common_pubdate">
+        <item name="android:textColor">@color/item_notselected_text</item>
+    </style>
+
+    <style name="item_notselected_title" parent="@style/item_common_title">
+        <item name="android:textColor">@color/item_notselected_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="item_selected_title" parent="@style/item_common_title">
+        <item name="android:textColor">@color/item_selected_text</item>
+    </style>
+
+    <style name="item_selected_pubdate" parent="@style/item_common_pubdate">
+        <item name="android:textColor">@color/item_selected_text</item>
     </style>
 
 </resources>

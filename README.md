@@ -15,6 +15,9 @@ Browser, you should get a question about which application you would
 like to open the page in, select "Weader" and after a short wait the
 feed should show up in the list.
 
+Or visit an OPML file in a browser, Weader should add all feeds listed
+in the OPML file.
+
 Most screens have an option menu where you can do things and some of
 the list items will react to a long press.
 
@@ -25,15 +28,27 @@ uninstall the application or clear its data all will be lost.
 The source to Weader can be found at
 [https://github.com/wingel/weader].
 
-FeedGoal
+News
+====
+
+Version 1.4
+
+Ripped out FeedGoal totally, everything is now written from scratch by
+Christer Weinigel.  The big changes are a new Atom/RSS feed parser
+(which is quite dumb but seems to be functional) and the database
+model is completely different.  The new database model should be much
+faster so Weader should start up faster.  There is also primitive
+support for OPML import.
+
+Building
 ========
 
-Weader is based on another feed reader for Android called FeedGoal.
-Almost all the GUI code is new code written by Christer, most of the
-guts of the application comes from FeedGoal, it does all of the
-fetching and parsing of feeds and it handles the SQLite database on
-the phone.  The source to FeedGoal can be found at
-[http://code.google.com/p/feedgoal/].
+I have only tried to build Weader using Eclipse and Android SDK 22.
+
+Open Preferences and go to Java / Build Path / Classpath Variables.
+Add a variable "ANDROID_SDK_HOME" with the path the Android SDK,
+i.e. "/opt/android-sdk".  This variable is used by some of the
+projects to find libraries inside the Android SDK.
 
 Known Bugs and Missing Features
 ===============================
@@ -41,12 +56,7 @@ Known Bugs and Missing Features
 Lots.  For the moment I just wanted to get the application up on
 Google Play so that friends can test it and come with feedback.
 
- * It seems that sometimes Weader fails to mark an article as read.
-   I believe this is fixed now.
-
 Missing features I'd like to implement some day:
-
- * OPML import
 
  * Offline support - download images so that feeds can be read
    offline.  This is probably quite tricky.
@@ -60,13 +70,21 @@ Missing features I'd like to implement some day:
 There are a lot more things I'd like to do, but this is just a hobby
 project so don't count on it happening soon.
 
+FeedGoal
+========
+
+Weader used to be based on another feed reader for Android called
+FeedGoal, but all code originally from FeedGoal is now gone.  If you
+are interested in FeedGoal anyway, the source to FeedGoal can be found
+at [http://code.google.com/p/feedgoal/].
+
 License
 =======
 
-Weader and FeedGoal are free software: you can redistribute and/or
-modify them under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.  See [GPL-3.0.txt].
+Weader is free software: you can redistribute and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your
+option) any later version.  See [GPL-3.0.txt].
 
 Some parts of Weader are distributed under a less restrictive license,
 the Apache License Version 2.0.  See [APACHE-2.0.txt].
@@ -91,5 +109,5 @@ The Weader logotype is based on the Feed Icon by Matt Brett found at
 distribution is a variant of the W in Ballantines-Medium font.
 
 The logo for the somewhat official release of Weader by Christer
-Weingiel is based on the logo for the compay Weinigel Ingenjörsbyrå AB
+Weinigel is based on the logo for the compay Weinigel Ingenjörsbyrå AB
 and can not be used without permisson from that companay.

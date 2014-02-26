@@ -1,24 +1,26 @@
 package se.weinigel.weader.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import se.weinigel.feedparser.Article;
+import se.weinigel.feedparser.Feed;
+import se.weinigel.feedparser.UrlHelper;
+import se.weinigel.weader.R;
 import se.weinigel.weader.contract.WeadContract;
-import se.weinigel.weader.provider.DbSchema;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.mfavez.android.feedgoal.common.Feed;
-import com.mfavez.android.feedgoal.common.Item;
-
 public class ContentHelper {
-	private static final long MAX_ARTICLES = 100;
+	public static final int MAX_ARTICLES = 100;
+	private static final boolean LIMIT_ARTICLES = false;
 
 	private Context mContext;
 
@@ -53,82 +55,69 @@ public class ContentHelper {
 
 	/* Articles */
 
-	private void insertArticle(long feedId, Item item) {
+	private void insertArticle(long feedId, Article article) {
+		byte[] data;
+		try {
+			data = article.raw.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+
 		ContentValues values = new ContentValues();
-		values.put(DbSchema.ItemSchema.COLUMN_FEED_ID, feedId);
-		values.put(DbSchema.ItemSchema.COLUMN_LINK, item.getLink().toString());
-		values.put(DbSchema.ItemSchema.COLUMN_GUID, item.getGuid());
-		values.put(DbSchema.ItemSchema.COLUMN_TITLE, item.getTitle());
-		if (item.getDescription() == null)
-			values.putNull(DbSchema.ItemSchema.COLUMN_DESCRIPTION);
-		else
-			values.put(DbSchema.ItemSchema.COLUMN_DESCRIPTION,
-					item.getDescription());
-		if (item.getContent() == null)
-			values.putNull(DbSchema.ItemSchema.COLUMN_CONTENT);
-		else
-			values.put(DbSchema.ItemSchema.COLUMN_CONTENT, item.getContent());
-		if (item.getImage() == null)
-			values.putNull(DbSchema.ItemSchema.COLUMN_IMAGE);
-		else
-			values.put(DbSchema.ItemSchema.COLUMN_IMAGE, item.getImage()
-					.toString());
-		values.put(DbSchema.ItemSchema.COLUMN_PUBDATE, item.getPubdate()
-				.getTime());
-		int state = DbSchema.ON;
-		if (!item.isFavorite())
-			state = DbSchema.OFF;
-		values.put(DbSchema.ItemSchema.COLUMN_FAVORITE, state);
-		if (!item.isRead())
-			state = DbSchema.OFF;
-		else
-			state = DbSchema.ON;
-		values.put(DbSchema.ItemSchema.COLUMN_READ, state);
+		values.put(WeadContract.Articles._FEED_ID, feedId);
+		values.put(WeadContract.Articles._TITLE, article.title);
+		values.put(WeadContract.Articles._PUBLISHED, article.published);
+		values.put(WeadContract.Articles._UPDATED, article.updated);
+		values.put(WeadContract.Articles._READ, article.read);
+		values.put(WeadContract.Articles._FAVORITE, article.favorite);
+		values.put(WeadContract.Articles._GUID, article.guid);
+		values.put(WeadContract.Articles._CONTENT_TYPE, article.type);
+		values.put(WeadContract.Articles._CONTENT, data);
 		insertArticle(values);
 	}
 
-	private void insertArticle(ContentValues values) {
-		insert(WeadContract.Article.CONTENT_URI, values);
+	private long insertArticle(ContentValues values) {
+		Uri uri = insert(WeadContract.Articles.CONTENT_URI, values);
+		return ContentUris.parseId(uri);
 	}
 
 	public void updateArticleRead(long articleId, boolean b) {
 		ContentValues values = new ContentValues();
-		values.put(WeadContract.Article.COLUMN_READ, b ? 1 : 0);
+		values.put(WeadContract.Articles._READ, b ? 1 : 0);
 		updateArticle(articleId, values);
 	}
 
 	public void updateArticleFavorite(long articleId, boolean b) {
 		ContentValues values = new ContentValues();
-		values.put(WeadContract.Article.COLUMN_FAVORITE, b ? 1 : 0);
+		values.put(WeadContract.Articles._FAVORITE, b ? 1 : 0);
 		updateArticle(articleId, values);
 	}
 
 	private void updateArticle(long articleId, ContentValues values) {
-		update(WeadContract.Article.CONTENT_URI, values,
-				WeadContract.Feed.COLUMN_ID + "=?",
+		update(WeadContract.Articles.CONTENT_URI, values,
+				WeadContract.Feeds._ID + "=?",
 				new String[] { Long.toString(articleId) });
 	}
 
 	public void updateAllArticlesRead(long feedId, boolean read) {
 		ContentValues values = new ContentValues();
-		values.put(WeadContract.Article.COLUMN_READ, read ? 1 : 0);
+		values.put(WeadContract.Articles._READ, read ? 1 : 0);
 
-		update(WeadContract.Article.CONTENT_URI, values,
-				WeadContract.Article.COLUMN_FEED_ID + "=?",
+		update(WeadContract.Articles.CONTENT_URI, values,
+				WeadContract.Articles._FEED_ID + "=?",
 				new String[] { Long.toString(feedId) });
 	}
 
 	private Set<String> getArticleGuids(long feedId) {
 		HashSet<String> guids = new HashSet<String>();
 
-		Cursor cursor = query(WeadContract.Article.CONTENT_URI,
-				new String[] { WeadContract.Article.COLUMN_GUID },
-				WeadContract.Article.COLUMN_FEED_ID + "=?",
+		Cursor cursor = query(WeadContract.Articles.CONTENT_URI,
+				new String[] { WeadContract.Articles._GUID },
+				WeadContract.Articles._FEED_ID + "=?",
 				new String[] { Long.toString(feedId) }, null);
 		try {
 			if (cursor.moveToFirst()) {
-				int col = cursor
-						.getColumnIndex(WeadContract.Article.COLUMN_GUID);
+				int col = cursor.getColumnIndex(WeadContract.Articles._GUID);
 				do {
 					guids.add(cursor.getString(col));
 				} while (cursor.moveToNext());
@@ -143,91 +132,79 @@ public class ContentHelper {
 
 	public long insertFeed(Feed feed) {
 		ContentValues values = new ContentValues();
-		values.put(DbSchema.FeedSchema.COLUMN_URL, feed.getURL().toString());
-		if (feed.getHomePage() == null)
-			values.putNull(DbSchema.FeedSchema.COLUMN_HOMEPAGE);
-		else
-			values.put(DbSchema.FeedSchema.COLUMN_HOMEPAGE, feed.getHomePage()
-					.toString());
-		if (feed.getTitle() == null)
-			values.putNull(DbSchema.FeedSchema.COLUMN_TITLE);
-		else
-			values.put(DbSchema.FeedSchema.COLUMN_TITLE, feed.getTitle());
-		if (feed.getType() == null)
-			values.putNull(DbSchema.FeedSchema.COLUMN_TYPE);
-		else
-			values.put(DbSchema.FeedSchema.COLUMN_TYPE, feed.getType());
-		if (feed.getRefresh() == null)
-			values.putNull(DbSchema.FeedSchema.COLUMN_REFRESH);
-		else
-			values.put(DbSchema.FeedSchema.COLUMN_REFRESH, feed.getRefresh()
-					.getTime());
-		int state = DbSchema.ON;
-		if (!feed.isEnabled())
-			state = DbSchema.OFF;
-		values.put(DbSchema.FeedSchema.COLUMN_ENABLE, state);
+		values.put(WeadContract.Feeds._URL, feed.url);
+		values.put(WeadContract.Feeds._TITLE, feed.title);
+		values.put(WeadContract.Feeds._LAST_MODIFIED, feed.lastModified);
+		values.put(WeadContract.Feeds._ETAG, feed.etag);
+		values.put(WeadContract.Feeds._REFRESH, feed.refresh);
 
-		return insertFeed(values, feed.getItems());
-	}
+		Uri uri = insert(WeadContract.Feeds.CONTENT_URI, values);
 
-	public long insertFeed(ContentValues values, List<Item> items) {
-		Uri uri = insert(WeadContract.Feed.CONTENT_URI, values);
 		long feedId = ContentUris.parseId(uri);
-		if (feedId != -1 && items != null) {
-			Iterator<Item> iterator = items.iterator();
-			while (iterator.hasNext()) {
-				Item item = iterator.next();
-				insertArticle(feedId, item);
+
+		List<Article> articles = feed.articles;
+		if (feedId != -1 && feed.articles != null) {
+			int i = 0;
+			if (LIMIT_ARTICLES) {
+				if (articles.size() > MAX_ARTICLES)
+					i = articles.size() - MAX_ARTICLES;
+			}
+			while (i < articles.size()) {
+				Article article = articles.get(i++);
+				insertArticle(feedId, article);
 			}
 		}
 		return feedId;
 	}
 
-	public boolean updateFeed(long feedId, Feed feed) {
+	public void updateFeed(long feedId, Feed feed) {
 		ContentValues values = new ContentValues();
 
-		if (feed.getRefresh() == null)
-			values.putNull(DbSchema.FeedSchema.COLUMN_REFRESH);
-		else
-			values.put(DbSchema.FeedSchema.COLUMN_REFRESH, feed.getRefresh()
-					.getTime());
+		values.put(WeadContract.Feeds._URL, feed.url);
+		values.put(WeadContract.Feeds._REFRESH, feed.refresh);
+		values.put(WeadContract.Feeds._LAST_MODIFIED, feed.lastModified);
+		values.put(WeadContract.Feeds._ETAG, feed.etag);
 
-		boolean feedUpdated = updateFeed(feedId, values) > 0;
+		updateFeed(feedId, values);
 
-		List<Item> items = feed.getItems();
-		if (feedUpdated && items != null) {
+		List<Article> articles = feed.articles;
+		if (articles != null) {
 			Set<String> guids = getArticleGuids(feedId);
 
-			Iterator<Item> iterator = items.listIterator();
-			Item item = null;
-			while (iterator.hasNext()) {
-				item = iterator.next();
-				if (!guids.contains(item.getGuid()))
-					insertArticle(feedId, item);
+			int i = 0;
+			if (LIMIT_ARTICLES) {
+				if (articles.size() > MAX_ARTICLES)
+					i = articles.size() - MAX_ARTICLES;
+			}
+			while (i < articles.size()) {
+				Article article = articles.get(i++);
+				if (!guids.contains(article.guid))
+					insertArticle(feedId, article);
 			}
 		}
+	}
 
-		return feedUpdated;
+	public void updateFeedRefresh(long feedId, long refresh) {
+		ContentValues values = new ContentValues();
+		values.put(WeadContract.Feeds._REFRESH, refresh);
+		updateFeed(feedId, values);
 	}
 
 	private int updateFeed(long feedId, ContentValues values) {
-		return update(WeadContract.Feed.CONTENT_URI, values,
-				WeadContract.Feed.COLUMN_ID + "=?",
+		return update(WeadContract.Feeds.CONTENT_URI, values,
+				WeadContract.Feeds._ID + "=?",
 				new String[] { Long.toString(feedId) });
 	}
 
 	public void deleteFeed(long feedId) {
-		delete(WeadContract.Article.CONTENT_URI,
-				WeadContract.Article.COLUMN_FEED_ID + "=?",
+		delete(WeadContract.Feeds.CONTENT_URI, WeadContract.Feeds._ID + "=?",
 				new String[] { Long.toString(feedId) });
-		delete(WeadContract.Feed.CONTENT_URI, WeadContract.Feed.COLUMN_ID
-				+ "=?", new String[] { Long.toString(feedId) });
 	}
 
 	public String getFeedUrl(long feedId) {
-		Cursor cursor = query(WeadContract.Feed.CONTENT_URI,
-				new String[] { WeadContract.Feed.COLUMN_URL },
-				WeadContract.Feed.COLUMN_ID + "=?",
+		Cursor cursor = query(WeadContract.Feeds.CONTENT_URI,
+				new String[] { WeadContract.Feeds._URL },
+				WeadContract.Feeds._ID + "=?",
 				new String[] { Long.toString(feedId) }, null);
 		try {
 			if (!cursor.moveToFirst())
@@ -240,11 +217,10 @@ public class ContentHelper {
 	}
 
 	public boolean hasFeed(String url) {
-		Cursor cursor = mContext.getContentResolver()
-				.query(WeadContract.Feed.CONTENT_URI,
-						new String[] { WeadContract.Feed.COLUMN_ID },
-						WeadContract.Feed.COLUMN_URL + "=?",
-						new String[] { url }, null);
+		Cursor cursor = mContext.getContentResolver().query(
+				WeadContract.Feeds.CONTENT_URI,
+				new String[] { WeadContract.Feeds._ID },
+				WeadContract.Feeds._URL + "=?", new String[] { url }, null);
 		try {
 			return cursor.moveToFirst();
 		} finally {
@@ -252,17 +228,39 @@ public class ContentHelper {
 		}
 	}
 
-	public void gcFeed(long feedId) {
-		delete(WeadContract.Article.CONTENT_URI,
+	public long getFeedId(String url) {
+		Cursor cursor = mContext.getContentResolver().query(
+				WeadContract.Feeds.CONTENT_URI,
+				new String[] { WeadContract.Feeds._ID },
+				WeadContract.Feeds._URL + "=?", new String[] { url }, null);
+		try {
+			if (cursor.moveToFirst())
+				return cursor.getLong(0);
+			else
+				return -1;
+		} finally {
+			cursor.close();
+		}
+	}
 
-				WeadContract.Article.COLUMN_ID + " IN (SELECT "
-						+ WeadContract.Article.COLUMN_ID + " FROM "
-						+ DbSchema.ItemSchema.TABLE_NAME + " WHERE "
-						+ WeadContract.Article.COLUMN_FEED_ID + "=?" + " AND "
-						+ WeadContract.Article.COLUMN_READ + "=1"
-						+ " ORDER BY " + WeadContract.Article.COLUMN_ID
-						+ " DESC LIMIT ?,-1)",
+	public void gcFeed(long feedId) {
+		delete(WeadContract.Articles.CONTENT_URI,
+				"feed_id=? AND OLDER THAN ?",
 				new String[] { Long.toString(feedId),
-						Long.toString(MAX_ARTICLES) });
+						Integer.toString(MAX_ARTICLES) });
+	}
+
+	public UrlHelper createUrlHelper() {
+		String versionName;
+		try {
+			versionName = mContext.getPackageManager().getPackageInfo(
+					mContext.getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+			versionName = "unknown";
+		}
+		UrlHelper urlHelper = new UrlHelper();
+		urlHelper.userAgent = mContext.getResources().getString(
+				R.string.user_agent, versionName);
+		return urlHelper;
 	}
 }

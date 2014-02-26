@@ -18,7 +18,7 @@ public class Feed {
 
 	public List<String> authors = new LinkedList<String>();
 
-	public List<Article> articles = new LinkedList<Article>();
+	public LinkedList<Article> articles = new LinkedList<Article>();
 
 	public String generator;
 

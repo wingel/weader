@@ -22,8 +22,8 @@ final class FeedListAdapter extends SimpleCursorAdapter implements
 	private final String LOG_TAG = getClass().getSimpleName();
 
 	protected static final String[] PROJECTION = new String[] {
-			WeadContract.Feed.COLUMN_ID, WeadContract.Feed.COLUMN_TITLE,
-			WeadContract.Feed.COLUMN_UNREAD, WeadContract.Feed.COLUMN_REFRESH };
+			WeadContract.Feeds._ID, WeadContract.Feeds._TITLE,
+			WeadContract.Feeds._UNREAD, WeadContract.Feeds._REFRESH };
 
 	private int mItemNotselectedText;
 	private int mItemSelectedText;
@@ -93,7 +93,7 @@ final class FeedListAdapter extends SimpleCursorAdapter implements
 		Log.d(LOG_TAG, Helper.getMethodName());
 
 		return new ErrorCheckingCursorLoader(mContext,
-				WeadContract.Feed.CONTENT_URI, PROJECTION, null, null, null);
+				WeadContract.Feeds.CONTENT_URI, PROJECTION, null, null, "title COLLATE LOCALIZED ASC");
 	}
 
 	@Override

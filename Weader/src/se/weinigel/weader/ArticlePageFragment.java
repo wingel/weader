@@ -1,14 +1,20 @@
 package se.weinigel.weader;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.ref.WeakReference;
 
-import se.weinigel.weader.R;
+import org.xmlpull.v1.XmlPullParser;
+
+import se.weinigel.feedparser.Article;
+import se.weinigel.feedparser.AtomFeedParser;
+import se.weinigel.feedparser.RSSParser;
+import se.weinigel.feedparser.XmlHelper;
 import se.weinigel.weader.client.ContentHelper;
 import se.weinigel.weader.contract.WeadContract;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -17,7 +23,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,18 +60,18 @@ public class ArticlePageFragment extends Fragment implements
 		mContentHelper = new ContentHelper(getActivity());
 
 		mArticleId = Helper.bundleGetStringLong(getArguments(),
-				WeadContract.Article.COLUMN_ID);
+				WeadContract.Articles._ID);
 
 		Log.d(LOG_TAG,
 				"onCreateView " + System.identityHashCode(savedInstanceState)
 						+ " o=" + getResources().getConfiguration().orientation
-						+ " id=" + mArticleId);
+						+ " guid=" + mArticleId);
 
 		mView = inflater.inflate(R.layout.fragment_article_page, container,
 				false);
 
 		Bundle bundle = new Bundle();
-		bundle.putLong(WeadContract.Article.COLUMN_ID, mArticleId);
+		bundle.putLong(WeadContract.Articles._ID, mArticleId);
 		getLoaderManager().initLoader(0, bundle, this);
 
 		if (mArticleId != -1) {
@@ -160,12 +165,11 @@ public class ArticlePageFragment extends Fragment implements
 	}
 
 	protected static final String[] PROJECTION = new String[] {
-			WeadContract.Article.COLUMN_TITLE,
-			WeadContract.Article.COLUMN_PUB_DATE,
-			WeadContract.Article.COLUMN_READ,
-			WeadContract.Article.COLUMN_FAVORITE,
-			WeadContract.Article.COLUMN_LINK,
-			WeadContract.Article.COLUMN_CONTENT };
+			WeadContract.Articles._TITLE,
+			WeadContract.Articles._PUBLISHED,
+			WeadContract.Articles._FAVORITE,
+			WeadContract.Articles._CONTENT_TYPE,
+			WeadContract.Articles._CONTENT };
 
 	private WeakReference<ArticlePageListener> mListener = new WeakReference<ArticlePageListener>(
 			null);
@@ -174,14 +178,14 @@ public class ArticlePageFragment extends Fragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		long articleId = args.getLong(WeadContract.Article.COLUMN_ID);
+		long articleId = args.getLong(WeadContract.Articles._ID);
 
-		Log.d(LOG_TAG, Helper.getMethodName() + " id=" + articleId);
-		String selection = WeadContract.Article.COLUMN_ID + "=?";
+		Log.d(LOG_TAG, Helper.getMethodName() + " guid=" + articleId);
+		String selection = WeadContract.Articles._ID + "=?";
 		String[] selectionArgs = new String[] { Long.toString(articleId) };
 
 		return new ErrorCheckingCursorLoader(getActivity(),
-				WeadContract.Article.CONTENT_URI, PROJECTION, selection,
+				WeadContract.Articles.CONTENT_URI, PROJECTION, selection,
 				selectionArgs, null);
 	}
 
@@ -193,21 +197,22 @@ public class ArticlePageFragment extends Fragment implements
 			return;
 
 		String title;
-		long date;
+		String date;
 		mRead = true;
 		mFavorite = false;
+		String contentType;
+		byte[] content;
 
-		String content;
 		try {
 			cursor.moveToFirst();
 			if (cursor.isAfterLast())
 				return;
 
 			title = cursor.getString(0);
-			date = cursor.getLong(1);
-			mFavorite = "1".equals(cursor.getString(3));
-			mLink = cursor.getString(4);
-			content = cursor.getString(5);
+			date = cursor.getString(1);
+			mFavorite = "1".equals(cursor.getString(2));
+			contentType = cursor.getString(3);
+			content = cursor.getBlob(4);
 		} catch (Exception e) {
 			Log.d(LOG_TAG, "cursor exception", e);
 			return;
@@ -227,25 +232,15 @@ public class ArticlePageFragment extends Fragment implements
 
 					Uri uri = Uri.parse(mLink);
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
-					MainActivity.startBrowserActivity(getActivity(), browserIntent);
+					MainActivity.startBrowserActivity(getActivity(),
+							browserIntent);
 				}
 			});
 		}
 
 		TextView dateView = (TextView) mView.findViewById(R.id.pub_date);
-		if (dateView != null) {
-			Resources res = getActivity().getResources();
-			CharSequence datePattern = res
-					.getText(R.string.pubdate_format_pattern);
-
-			try {
-				String formattedDate = DateFormat.format(datePattern, date)
-						.toString();
-				dateView.setText(formattedDate);
-			} catch (NumberFormatException e) {
-				Log.d(LOG_TAG, "Invalid date for article " + title, e);
-			}
-		}
+		if (dateView != null)
+			dateView.setText(date);
 
 		ImageView favView = (ImageView) mView.findViewById(R.id.fav);
 		if (favView != null) {
@@ -269,26 +264,61 @@ public class ArticlePageFragment extends Fragment implements
 			webView.setFocusableInTouchMode(false);
 			webView.setFocusable(false);
 
-			if (content != null) {
+			Article article = null;
+			try {
+				String s = new String(content, "UTF-8");
+
+				Log.d(LOG_TAG,
+						"webView.loadData "
+								+ contentType
+								+ " "
+								+ s.substring(0,
+										s.length() >= 100 ? 100 : s.length()));
+
+				XmlPullParser parser = XmlHelper.createParser(new StringReader(
+						s));
+
+				if (Article.ATOM.equals(contentType))
+					article = AtomFeedParser.parseEntry(parser);
+				else if (Article.RSS.equals(contentType))
+					article = RSSParser.parseEntry(parser);
+				else {
+					throw new IOException("unknown value type " + contentType);
+				}
+
+				String text = article.content;
+				mLink = article.alternate;
+
 				if (content != null) {
 					Log.d(LOG_TAG,
-							"webView.loadData " + mLink + " "
-									+ content.substring(0, 40));
+							"webView.loadData "
+									+ mLink
+									+ " "
+									+ text.substring(
+											0,
+											text.length() >= 40 ? 40 : text
+													.length()));
 
-					// This is a hack which tries to make images smaller than
-					// the screen width
-					content = "<style type='text/css'>img {max-width: 95%;height:initial;} div,p,span,a {max-width: 100%;}</style>"
-							+ content;
-					webView.loadDataWithBaseURL(mLink, content, "text/html",
+					// TODO try to identify plain text
+
+					// This is a hack which tries to make images smaller
+					// than the screen width
+					text = "<style type='text/css'>img {max-width: 95%;height:initial;} div,p,span,a {max-width: 100%;}</style>"
+							+ text;
+					webView.loadDataWithBaseURL(mLink, text, "text/html",
 							"utf-8", null);
 				}
+
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "failed to parse content", e);
+				return;
 			}
 		}
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
-		Log.d(LOG_TAG, Helper.getMethodName() + " id=" + mArticleId);
+		Log.d(LOG_TAG, Helper.getMethodName() + " guid=" + mArticleId);
 	}
 
 	public boolean isRead() {
@@ -337,7 +367,7 @@ public class ArticlePageFragment extends Fragment implements
 
 	public void refresh() {
 		Bundle bundle = new Bundle();
-		bundle.putLong(WeadContract.Article.COLUMN_ID, mArticleId);
+		bundle.putLong(WeadContract.Articles._ID, mArticleId);
 		getLoaderManager().restartLoader(0, bundle, this);
 	}
 
@@ -414,9 +444,9 @@ public class ArticlePageFragment extends Fragment implements
 			try {
 				Cursor cursor;
 				cursor = getActivity().getContentResolver().query(
-						WeadContract.Article.CONTENT_URI,
-						new String[] { WeadContract.Article.COLUMN_FEED_ID, },
-						WeadContract.Article.COLUMN_ID + "=?",
+						WeadContract.Articles.CONTENT_URI,
+						new String[] { WeadContract.Articles._FEED_ID, },
+						WeadContract.Articles._ID + "=?",
 						new String[] { articleId.toString() }, null);
 				cursor.moveToFirst();
 				if (cursor.isAfterLast()) {
@@ -427,9 +457,9 @@ public class ArticlePageFragment extends Fragment implements
 				cursor.close();
 
 				cursor = getActivity().getContentResolver().query(
-						WeadContract.Feed.CONTENT_URI,
-						new String[] { WeadContract.Feed.COLUMN_TITLE },
-						WeadContract.Feed.COLUMN_ID + "=?",
+						WeadContract.Feeds.CONTENT_URI,
+						new String[] { WeadContract.Feeds._TITLE },
+						WeadContract.Feeds._ID + "=?",
 						new String[] { Long.toString(feedId) }, null);
 				cursor.moveToFirst();
 				if (cursor.isAfterLast()) {

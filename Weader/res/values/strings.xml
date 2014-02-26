@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="favorites">Favorites</string>
     <string name="about_title">A simple Atom/RSS Feed Reader</string>
-    <string name="about_copying">Weader is based on another feed reader for Android called FeedGoal.\n\nWeader and FeedGoal are free software: you can redistribute and/or modify them under the terms of the GNU General Public License as published by  the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
+    <string name="about_copying">Weader is free software: you can redistribute and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
     <string name="about_version">Version %1$s</string>
+    <string name="user_agent">Weader/%1$s</string>
     <string name="about_website">https://github.com/wingel/weader</string>
     <string name="action_add_feed">Add Feed</string>
     <string name="action_about">About</string>
@@ -37,5 +39,10 @@
     <string name="pref_path_item_filter_summary">Weader tries to recognize links that might be feeds.  This can cause problems with some pages so this feature can be turned off.</string>
     <string name="pref_path_item_filter_title">Handle feed links</string>
     <string name="title_activity_settings">Weader - Settings</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="legacy_upgrade_started">Database upgrade started</string>
+    <string name="legacy_upgrade_success">Database upgrade finished</string>
+    <string name="legacy_upgrade_failure">Database upgrade failed</string>
 
 </resources>

@@ -44,7 +44,7 @@ public class AtomFeedParser extends XmlHelper {
 				// System.out.println(entry.raw);
 				System.out.println();
 
-				feed.articles.add(article);
+				feed.articles.push(article);
 			} else if ("title".equals(name)) {
 				feed.title = parseTextNormalized(parser);
 				System.out.println("feed title: " + feed.title);
